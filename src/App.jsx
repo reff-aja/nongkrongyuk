@@ -4,7 +4,7 @@ import Beranda from './beranda';
 import DetailCafe from './detail';
 import Simpan from './simpan';
 import Profil from './profil';
-import Peta from './peta'
+import Peta from './peta';
 
 const CAFE_DATA = [
   {
@@ -49,13 +49,52 @@ const CAFE_DATA = [
   }
 ];
 
+// KOMPONEN SIDEBAR KHUSUS DESKTOP
+const Sidebar = ({ currentPage, onNavigate }) => {
+  return (
+    <aside className="sidebar-desktop">
+      <div className="sidebar-brand">
+        <h2>Nongkrongyuk</h2>
+      </div>
+      <nav className="sidebar-menu">
+        <div 
+          className={`sidebar-item ${currentPage === 'beranda' ? 'active' : ''}`} 
+          onClick={() => onNavigate('beranda')}
+        >
+          <span className="sidebar-icon">🏠</span>
+          <span>Beranda</span>
+        </div>
+        <div 
+          className={`sidebar-item ${currentPage === 'peta' ? 'active' : ''}`} 
+          onClick={() => onNavigate('peta')}
+        >
+          <span className="sidebar-icon">🗺️</span>
+          <span>Peta Lokasi</span>
+        </div>
+        <div 
+          className={`sidebar-item ${currentPage === 'simpan' ? 'active' : ''}`} 
+          onClick={() => onNavigate('simpan')}
+        >
+          <span className="sidebar-icon">🔖</span>
+          <span>Disimpan</span>
+        </div>
+        <div 
+          className={`sidebar-item ${currentPage === 'profil' ? 'active' : ''}`} 
+          onClick={() => onNavigate('profil')}
+        >
+          <span className="sidebar-icon">👤</span>
+          <span>Profil Saya</span>
+        </div>
+      </nav>
+    </aside>
+  );
+};
+
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentPage, setCurrentPage] = useState('beranda'); 
   const [selectedCafeId, setSelectedCafeId] = useState(null);
   const [savedCafes, setSavedCafes] = useState([]);
-  
-  // STATE BAHARU: Untuk mengawal Toast Notification
   const [toastMessage, setToastMessage] = useState(null);
   const [isToastHiding, setIsToastHiding] = useState(false);
 
@@ -63,17 +102,14 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  // Fungsi Pembantu: Paparkan Toast
   const showToast = (message) => {
-    setIsToastHiding(false); // Pastikan animasi masuk
+    setIsToastHiding(false);
     setToastMessage(message);
-    
-    // Sembunyikan secara automatik selepas 2.5 saat
     setTimeout(() => {
-      setIsToastHiding(true); // Mulakan animasi keluar
+      setIsToastHiding(true);
       setTimeout(() => {
-        setToastMessage(null); // Padam sepenuhnya dari skrin selepas animasi tamat
-      }, 300); // 300ms sesuai dengan masa animasi di CSS
+        setToastMessage(null);
+      }, 300);
     }, 2500); 
   };
 
@@ -81,10 +117,10 @@ export default function App() {
     e.stopPropagation(); 
     setSavedCafes((prev) => {
       if (prev.includes(id)) {
-        showToast("Dibuang dari halaman simpan"); // Tunjuk Toast bila buang
+        showToast("Dibuang dari senarai Simpan 🗑️");
         return prev.filter(cafeId => cafeId !== id); 
       } else {
-        showToast("Berhasil disimpan!"); // Tunjuk Toast bila tambah
+        showToast("Berjaya disimpan! ❤️");
         return [...prev, id]; 
       }
     });
@@ -104,61 +140,68 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Komponen Toast Papar Di Sini */}
       {toastMessage && (
         <div className={`toast-container ${isToastHiding ? 'hiding' : ''}`}>
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {currentPage === 'beranda' && (
-        <Beranda 
-          isDarkMode={isDarkMode} 
-          setIsDarkMode={setIsDarkMode} 
-          cafeData={CAFE_DATA}
-          savedCafes={savedCafes}
-          onCafeClick={handleNavigateToDetail}
-          onToggleSave={handleToggleSave}
-          onNavigate={navigateTo}
-        />
-      )}
-      
-      {currentPage === 'detail' && (
-        <DetailCafe 
-          cafe={activeCafe} 
-          onBack={() => navigateTo('beranda')} 
-        />
-      )}
+      {/* STRUKTUR TATA LETAK UTAMA */}
+      <div className="main-layout">
+        {/* Sidebar dipasang di sini, CSS yang akan mengatur persembunyiannya di HP */}
+        <Sidebar currentPage={currentPage} onNavigate={navigateTo} />
 
-      {currentPage === 'simpan' && (
-        <Simpan 
-          isDarkMode={isDarkMode} 
-          setIsDarkMode={setIsDarkMode} 
-          cafeData={CAFE_DATA}
-          savedCafes={savedCafes}
-          onCafeClick={handleNavigateToDetail}
-          onToggleSave={handleToggleSave}
-          onNavigate={navigateTo}
-        />
-      )}
+        {/* Konten Halaman Aktif */}
+        <div className="page-content-wrapper">
+          {currentPage === 'beranda' && (
+            <Beranda 
+              isDarkMode={isDarkMode} 
+              setIsDarkMode={setIsDarkMode} 
+              cafeData={CAFE_DATA}
+              savedCafes={savedCafes}
+              onCafeClick={handleNavigateToDetail}
+              onToggleSave={handleToggleSave}
+              onNavigate={navigateTo}
+            />
+          )}
+          
+          {currentPage === 'detail' && (
+            <DetailCafe 
+              cafe={activeCafe} 
+              onBack={() => navigateTo('beranda')} 
+            />
+          )}
 
-      {currentPage === 'peta' && (
-        <Peta 
-          isDarkMode={isDarkMode} 
-          setIsDarkMode={setIsDarkMode} 
-          onNavigate={navigateTo}
-        />
-      )}
+          {currentPage === 'simpan' && (
+            <Simpan 
+              isDarkMode={isDarkMode} 
+              setIsDarkMode={setIsDarkMode} 
+              cafeData={CAFE_DATA}
+              savedCafes={savedCafes}
+              onCafeClick={handleNavigateToDetail}
+              onToggleSave={handleToggleSave}
+              onNavigate={navigateTo}
+            />
+          )}
 
-      {/* --- TAMBAHKAN BLOK PROFIL INI --- */}
-      {currentPage === 'profil' && (
-        <Profil 
-          isDarkMode={isDarkMode} 
-          setIsDarkMode={setIsDarkMode} 
-          onNavigate={navigateTo}
-          savedCount={savedCafes.length} 
-        />
-      )}
+          {currentPage === 'peta' && (
+            <Peta 
+              isDarkMode={isDarkMode} 
+              setIsDarkMode={setIsDarkMode} 
+              onNavigate={navigateTo}
+            />
+          )}
+
+          {currentPage === 'profil' && (
+            <Profil 
+              isDarkMode={isDarkMode} 
+              setIsDarkMode={setIsDarkMode} 
+              onNavigate={navigateTo}
+              savedCount={savedCafes.length} 
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }

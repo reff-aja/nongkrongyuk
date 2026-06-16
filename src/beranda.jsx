@@ -33,7 +33,7 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
         <div className="header-content">
           <div className="header-top">
             <div className="header-brand">
-              <h1 className="title">Nongkrongyuk</h1>
+              <h1 className="title">Temukan Spot Favoritmu</h1>
               <span className="location">📍 Ciomas, Bogor</span>
             </div>
             <div className="header-actions">

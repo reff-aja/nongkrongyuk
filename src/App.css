@@ -22,6 +22,15 @@
 }
 
 /* --- RESET & BASIC --- */
+/* Pastikan tag html dan body benar-benar diset penuh tanpa batas margin default browser */
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -31,14 +40,33 @@
 }
 
 body {
-  background-color: var(--bg-color);
   color: var(--text-main);
 }
 
+/* Kunci utama memaksa aplikasi meregang penuh */
 .app-container {
   width: 100%;
-  overflow-x: hidden; 
   min-height: 100vh;
+  overflow-x: hidden; 
+}
+
+/* TATA LETAK STRUKTUR SIDEBAR + KONTEN */
+.main-layout {
+  display: flex;
+  width: 100vw; /* Memaksa layout mengambil 100% lebar layar monitor */
+  min-height: 100vh;
+}
+
+.page-content-wrapper {
+  flex-grow: 1;
+  width: calc(100vw - 260px); /* Sisa layar setelah diambil sidebar */
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+/* DEFAULT MOBILE: Sembunyikan Sidebar */
+.sidebar-desktop {
+  display: none;
 }
 
 /* --- ANIMASI --- */
@@ -61,9 +89,11 @@ header {
   z-index: 100;
   box-shadow: 0 2px 15px rgba(0,0,0,0.05);
   padding: 15px 20px;
+  width: 100%;
 }
 
 .header-content {
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -208,9 +238,9 @@ header {
 /* --- BODY & KARTU REKOMENDASI --- */
 .container {
   padding: 20px;
-  padding-bottom: 120px; /* Bantalan aman di mobile */
+  padding-bottom: 120px; 
   display: grid;
-  grid-template-columns: 1fr; /* Default mobile: 1 kolom */
+  grid-template-columns: 1fr;
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
@@ -325,6 +355,7 @@ header {
 .detail-page {
   background-color: var(--bg-color);
   min-height: 100vh;
+  width: 100%;
 }
 
 .detail-header {
@@ -526,6 +557,7 @@ header {
 /* --- STYLE HALAMAN PROFIL --- */
 .profile-page {
   padding-bottom: 120px; 
+  width: 100%;
 }
 
 .profile-header-large {
@@ -675,6 +707,7 @@ header {
   flex-direction: column;
   height: 100vh; 
   overflow: hidden;
+  width: 100%;
 }
 
 .map-container {
@@ -695,39 +728,94 @@ header {
 }
 
 /* ==========================================================================
-   --- ATURAN RESPONSIVE DESKTOP & LAPTOP (MIN-WIDTH: 768px) ---
+   --- ATURAN RESPONSIVE LAPTOP/DESKTOP (MIN-WIDTH: 768px) ---
    ========================================================================== */
 @media (min-width: 768px) {
-  /* 1. Sembunyikan Bottom Bar Mobile karena navigasi bisa lewat tombol Profil di kanan atas */
   .bottom-bar { 
     display: none !important; 
   }
   
-  /* 2. Sesuaikan Padding Halaman Utama agar proporsional di layar lebar */
-  .container { 
-    /* Mengubah susunan kartu menjadi multi-kolom otomatis (Grid) */
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    padding: 40px 20px; 
-    gap: 30px;
+  .sidebar-desktop {
+    display: flex;
+    flex-direction: column;
+    width: 260px; 
+    background-color: var(--nav-bg);
+    border-right: 1px solid var(--accent);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 30px 20px;
+    z-index: 105;
+    flex-shrink: 0;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.02);
+  }
+
+  .sidebar-brand h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 40px;
+    color: var(--text-main);
+  }
+
+  .sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 20px;
+    border-radius: 16px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .sidebar-item:hover {
+    background-color: var(--accent);
+    color: var(--text-main);
+    transform: translateX(4px);
+  }
+
+  .sidebar-item.active {
+    background-color: var(--search-bg);
+    color: var(--search-text);
   }
   
-  /* 3. Sesuaikan Tinggi Foto Utama Halaman Detail di Desktop */
+  .sidebar-icon {
+    font-size: 1.3rem;
+  }
+
+  .container { 
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+    padding: 40px; 
+    gap: 30px;
+    padding-bottom: 40px; 
+  }
+  
   .detail-image-container {
-    height: 400px;
+    height: 450px;
     border-radius: 0 0 24px 24px;
   }
   
-  /* 4. Sesuaikan Padding Konten Map agar tidak menyisakan ruang bottom bar mobile */
   .map-container {
     padding-bottom: 0;
   }
   
-  /* 5. Ubah Letak Pop-Up Toast agar melayang pas di bagian bawah monitor laptop */
   .toast-container {
     bottom: 40px;
+    left: calc(50% + 130px); 
   }
-  
-  /* 6. Atur Header agar teks judulnya sedikit lebih besar dan mewah */
+
+  .profile-page, .map-page {
+    padding-bottom: 0;
+  }
+
   .title {
     font-size: 1.6rem;
   }

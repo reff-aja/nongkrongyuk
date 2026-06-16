@@ -82,26 +82,6 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
           </div>
         </div>
       </div>
-
-      {/* BOTTOM BAR (Otomatis sembunyi di laptop lewat CSS) */}
-      <nav className="bottom-bar">
-        <div className="nav-item" onClick={() => onNavigate('beranda')}>
-          <span className="nav-icon">🏠</span>
-          <span>Beranda</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('peta')}>
-          <span className="nav-icon">🗺️</span>
-          <span>Peta</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('simpan')}>
-          <span className="nav-icon">🔖</span>
-          <span>Simpan</span>
-        </div>
-        <div className="nav-item" style={{ color: 'var(--text-main)' }}>
-          <span className="nav-icon">👤</span>
-          <span>Profil</span>
-        </div>
-      </nav>
     </div>
   );
 }
