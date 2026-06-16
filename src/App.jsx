@@ -3,6 +3,8 @@ import './App.css';
 import Beranda from './beranda';
 import DetailCafe from './detail';
 import Simpan from './simpan';
+import Profil from './profil';
+import Peta from './peta'
 
 const CAFE_DATA = [
   {
@@ -137,6 +139,24 @@ export default function App() {
           onCafeClick={handleNavigateToDetail}
           onToggleSave={handleToggleSave}
           onNavigate={navigateTo}
+        />
+      )}
+
+      {currentPage === 'peta' && (
+        <Peta 
+          isDarkMode={isDarkMode} 
+          setIsDarkMode={setIsDarkMode} 
+          onNavigate={navigateTo}
+        />
+      )}
+
+      {/* --- TAMBAHKAN BLOK PROFIL INI --- */}
+      {currentPage === 'profil' && (
+        <Profil 
+          isDarkMode={isDarkMode} 
+          setIsDarkMode={setIsDarkMode} 
+          onNavigate={navigateTo}
+          savedCount={savedCafes.length} 
         />
       )}
     </div>

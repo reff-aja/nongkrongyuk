@@ -31,14 +31,25 @@ export default function Simpan({ isDarkMode, setIsDarkMode, cafeData, savedCafes
         <div className="header-content">
           <div className="header-top">
             <div className="header-brand">
-              <h1 className="title">Disimpan 🔖</h1>
+              <h1 
+                className="title" 
+                onClick={() => onNavigate('beranda')} 
+                style={{ cursor: 'pointer' }}
+                title="Kembali ke Beranda"
+              >
+                Disimpan 🔖
+              </h1>
               <span className="location">Koleksi Tempat Favoritmu</span>
             </div>
             <div className="header-actions">
-              <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
-                {isDarkMode ? '🌙' : '☀️'}
+              {/* Tombol ganti tema sengaja dihilangkan dari header karena sudah dipindah ke halaman Profil */}
+              <button className="profile-menu" onClick={() => onNavigate('profil')}>
+                <img 
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" 
+                  alt="Foto Profil" 
+                  className="profile-img" 
+                />
               </button>
-              <button className="profile-menu">🧑‍💻</button>
             </div>
           </div>
         </div>
@@ -64,13 +75,13 @@ export default function Simpan({ isDarkMode, setIsDarkMode, cafeData, savedCafes
         )}
       </main>
 
-      {/* BOTTOM BAR */}
+      {/* BOTTOM BAR - Dipastikan hanya ada 1 dan navigasi profilnya aktif */}
       <nav className="bottom-bar">
         <div className="nav-item" onClick={() => onNavigate('beranda')}>
           <span className="nav-icon">🏠</span>
           <span>Beranda</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => onNavigate('peta')}>
           <span className="nav-icon">🗺️</span>
           <span>Peta</span>
         </div>
@@ -78,7 +89,7 @@ export default function Simpan({ isDarkMode, setIsDarkMode, cafeData, savedCafes
           <span className="nav-icon">🔖</span>
           <span>Simpan</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => onNavigate('profil')}>
           <span className="nav-icon">👤</span>
           <span>Profil</span>
         </div>

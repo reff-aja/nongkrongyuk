@@ -40,7 +40,13 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
               <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
                 {isDarkMode ? '🌙' : '☀️'}
               </button>
-              <button className="profile-menu">🧑‍💻</button>
+              <button className="profile-menu" onClick={() => onNavigate('profil')}>
+                <img 
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" 
+                  alt="Foto Profil" 
+                  className="profile-img" 
+                />
+              </button>
             </div>
           </div>
           <input 
@@ -77,7 +83,7 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
           <span className="nav-icon">🏠</span>
           <span>Beranda</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => onNavigate('peta')}>
           <span className="nav-icon">🗺️</span>
           <span>Peta</span>
         </div>
@@ -85,7 +91,7 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
           <span className="nav-icon">🔖</span>
           <span>Simpan</span>
         </div>
-        <div className="nav-item">
+        <div className="nav-item" onClick={() => onNavigate('profil')}>
           <span className="nav-icon">👤</span>
           <span>Profil</span>
         </div>

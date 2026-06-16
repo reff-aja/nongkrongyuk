@@ -35,7 +35,6 @@ body {
   color: var(--text-main);
 }
 
-/* Kunci utama agar layar tidak bisa bocor ke samping */
 .app-container {
   width: 100%;
   overflow-x: hidden; 
@@ -72,14 +71,16 @@ header {
 .header-top {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center; 
   margin-bottom: 15px;
+  gap: 15px; 
 }
 
 .header-brand {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  flex: 1; 
 }
 
 .title {
@@ -100,7 +101,7 @@ header {
   gap: 12px;
 }
 
-.theme-toggle, .profile-menu {
+.theme-toggle {
   background: none;
   border: none;
   font-size: 1.4rem;
@@ -109,8 +110,35 @@ header {
   padding: 5px;
 }
 
-.theme-toggle:hover, .profile-menu:hover {
+.theme-toggle:hover {
   transform: scale(1.15);
+}
+
+.profile-menu {
+  background: none;
+  border: 2px solid var(--accent);
+  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex-shrink: 0;
+}
+
+.profile-menu:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Kolom Pencarian */
@@ -145,10 +173,6 @@ header {
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
-.search-bar:focus::placeholder {
-  color: var(--text-muted);
-}
-
 /* Kategori */
 .categories {
   display: flex;
@@ -172,7 +196,7 @@ header {
   color: var(--text-main);
   cursor: pointer;
   transition: transform 0.2s, background-color 0.2s;
-  flex-shrink: 0; /* Tambahan agar tombol tidak gepeng di layar kecil */
+  flex-shrink: 0;
 }
 
 .category-chip:hover {
@@ -184,10 +208,9 @@ header {
 /* --- BODY & KARTU REKOMENDASI --- */
 .container {
   padding: 20px;
-  padding-bottom: 120px; /* Bantalan bawah aman untuk bottom bar */
+  padding-bottom: 120px; /* Bantalan aman di mobile */
   display: grid;
-  /* FIX RESPONSIVE: Di HP cukup pakai 1 kolom bebas (1fr) agar tidak menjebol layar */
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr; /* Default mobile: 1 kolom */
   gap: 20px;
   max-width: 1200px;
   margin: 0 auto;
@@ -298,7 +321,7 @@ header {
   margin-bottom: 4px;
 }
 
-/* --- STYLE TAMBAHAN HALAMAN DETAIL CAFE --- */
+/* --- STYLE HALAMAN DETAIL CAFE --- */
 .detail-page {
   background-color: var(--bg-color);
   min-height: 100vh;
@@ -355,13 +378,6 @@ header {
   width: 100%;
   height: 300px;
   overflow: hidden;
-}
-
-@media (min-width: 768px) {
-  .detail-image-container {
-    height: 400px;
-    border-radius: 0 0 20px 20px;
-  }
 }
 
 .detail-main-image {
@@ -472,20 +488,10 @@ header {
   color: var(--text-muted);
 }
 
-/* --- RESPONSIVE DESKTOP RULES --- */
-@media (min-width: 768px) {
-  .bottom-bar { display: none !important; }
-  .container { 
-    /* Di layar laptop, kembalikan menjadi banyak kolom */
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-    padding: 30px 20px;
-  }
-}
-
 /* --- TOAST NOTIFICATION --- */
 .toast-container {
   position: fixed;
-  bottom: 80px; /* Muncul sedikit di atas bottom bar */
+  bottom: 80px; 
   left: 50%;
   transform: translateX(-50%);
   background-color: var(--text-main);
@@ -495,17 +501,14 @@ header {
   font-size: 0.9rem;
   font-weight: 600;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  z-index: 1000; /* Pastikan selalu di atas segalanya */
+  z-index: 1000; 
   display: flex;
   align-items: center;
   gap: 8px;
-  pointer-events: none; /* User masih bisa klik elemen di baliknya */
-  
-  /* Animasi masuk dari bawah */
+  pointer-events: none; 
   animation: slideUpFadeIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* Jika toast sedang menghilang (keluar) */
 .toast-container.hiding {
   animation: fadeOutDown 0.3s ease-in forwards;
 }
@@ -518,4 +521,214 @@ header {
 @keyframes fadeOutDown {
   from { opacity: 1; transform: translate(-50%, 0); }
   to { opacity: 0; transform: translate(-50%, 20px); }
+}
+
+/* --- STYLE HALAMAN PROFIL --- */
+.profile-page {
+  padding-bottom: 120px; 
+}
+
+.profile-header-large {
+  background-color: var(--nav-bg);
+  padding: 40px 20px 30px;
+  text-align: center;
+  border-bottom: 1px solid var(--accent);
+  border-radius: 0 0 30px 30px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+}
+
+.avatar-large {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 15px;
+  border-radius: 50%;
+  border: 4px solid var(--accent);
+  background-color: var(--card-bg);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-img-large {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 5px;
+}
+
+.profile-email {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.profile-content {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.profile-stats {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  margin-bottom: 30px;
+  margin-top: -40px; 
+  position: relative;
+  z-index: 10;
+}
+
+.stat-box {
+  text-align: center;
+  flex: 1;
+  cursor: pointer;
+}
+
+.stat-box:not(:last-child) {
+  border-right: 1px solid var(--accent);
+}
+
+.stat-box h3 {
+  font-size: 1.2rem;
+  color: var(--text-main);
+  margin-bottom: 5px;
+}
+
+.stat-box p {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.settings-container {
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  padding: 10px 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.settings-title {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 15px 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--accent);
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+  transition: transform 0.2s;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-item:hover {
+  transform: translateX(5px);
+}
+
+.setting-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-weight: 600;
+}
+
+.setting-icon {
+  font-size: 1.2rem;
+}
+
+.setting-status {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background-color: var(--accent);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+.logout-item {
+  color: #D32F2F;
+}
+
+[data-theme='dark'] .logout-item {
+  color: #FF5252;
+}
+
+/* --- STYLE HALAMAN PETA --- */
+.map-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  overflow: hidden;
+}
+
+.map-container {
+  flex-grow: 1; 
+  width: 100%;
+  padding-bottom: 80px; 
+  background-color: var(--accent);
+}
+
+.map-container iframe {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+}
+
+[data-theme='dark'] .map-container iframe {
+  filter: invert(90%) hue-rotate(180deg) brightness(85%) contrast(85%);
+}
+
+/* ==========================================================================
+   --- ATURAN RESPONSIVE DESKTOP & LAPTOP (MIN-WIDTH: 768px) ---
+   ========================================================================== */
+@media (min-width: 768px) {
+  /* 1. Sembunyikan Bottom Bar Mobile karena navigasi bisa lewat tombol Profil di kanan atas */
+  .bottom-bar { 
+    display: none !important; 
+  }
+  
+  /* 2. Sesuaikan Padding Halaman Utama agar proporsional di layar lebar */
+  .container { 
+    /* Mengubah susunan kartu menjadi multi-kolom otomatis (Grid) */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    padding: 40px 20px; 
+    gap: 30px;
+  }
+  
+  /* 3. Sesuaikan Tinggi Foto Utama Halaman Detail di Desktop */
+  .detail-image-container {
+    height: 400px;
+    border-radius: 0 0 24px 24px;
+  }
+  
+  /* 4. Sesuaikan Padding Konten Map agar tidak menyisakan ruang bottom bar mobile */
+  .map-container {
+    padding-bottom: 0;
+  }
+  
+  /* 5. Ubah Letak Pop-Up Toast agar melayang pas di bagian bawah monitor laptop */
+  .toast-container {
+    bottom: 40px;
+  }
+  
+  /* 6. Atur Header agar teks judulnya sedikit lebih besar dan mewah */
+  .title {
+    font-size: 1.6rem;
+  }
 }
