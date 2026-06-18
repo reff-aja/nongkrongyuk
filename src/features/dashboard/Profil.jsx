@@ -74,7 +74,8 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
             <span className="setting-arrow">➡️</span>
           </div>
 
-          <div className="setting-item logout-item" onClick={() => alert('Kamu berhasil Logout (Boongan) 👋')}>
+          {/* Ganti baris ini di file Profil.jsx kamu */}
+          <div className="setting-item logout-item" onClick={onLogout}>
             <div className="setting-info">
               <span className="setting-icon">🚪</span>
               <span>Keluar Akun</span>

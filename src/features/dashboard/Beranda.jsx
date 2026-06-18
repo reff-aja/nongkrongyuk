@@ -20,6 +20,7 @@ const CafeCard = ({ cafe, onClick, isSaved, onToggleSave }) => {
   );
 };
 
+// Tidak perlu lagi menerima props 'isLoggedIn'
 export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafes, onCafeClick, onToggleSave, onNavigate }) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -33,13 +34,15 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
         <div className="header-content">
           <div className="header-top">
             <div className="header-brand">
-              <h1 className="title">Temukan Spot Favoritmu</h1>
+              <h1 className="title">Enaknya nongkrong dimana nih?</h1>
               <span className="location">📍 Ciomas, Bogor</span>
             </div>
             <div className="header-actions">
               <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
                 {isDarkMode ? '🌙' : '☀️'}
               </button>
+              
+              {/* PASTI SUDAH LOGIN: Langsung tampilkan foto profil */}
               <button className="profile-menu" onClick={() => onNavigate('profil')}>
                 <img 
                   src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" 
@@ -77,23 +80,19 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
         )}
       </main>
 
-      {/* BOTTOM BAR - Kini Berfungsi! */}
+      {/* BOTTOM BAR VIP: Tampilkan semua menu tanpa syarat */}
       <nav className="bottom-bar">
         <div className="nav-item" onClick={() => onNavigate('beranda')} style={{ color: 'var(--text-main)' }}>
-          <span className="nav-icon">🏠</span>
-          <span>Beranda</span>
+          <span className="nav-icon">🏠</span><span>Beranda</span>
         </div>
         <div className="nav-item" onClick={() => onNavigate('peta')}>
-          <span className="nav-icon">🗺️</span>
-          <span>Peta</span>
+          <span className="nav-icon">🗺️</span><span>Peta</span>
         </div>
         <div className="nav-item" onClick={() => onNavigate('simpan')}>
-          <span className="nav-icon">🔖</span>
-          <span>Simpan</span>
+          <span className="nav-icon">🔖</span><span>Simpan</span>
         </div>
         <div className="nav-item" onClick={() => onNavigate('profil')}>
-          <span className="nav-icon">👤</span>
-          <span>Profil</span>
+          <span className="nav-icon">👤</span><span>Profil</span>
         </div>
       </nav>
     </div>

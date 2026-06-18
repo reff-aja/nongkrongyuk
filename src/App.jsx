@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import Beranda from './beranda';
-import DetailCafe from './detail';
-import Simpan from './simpan';
-import Profil from './profil';
-import Peta from './peta';
+import LandingPage from './features/public/LandingPage'; // Import baru
+import Beranda from './features/dashboard/Beranda';   // Jalur baru setelah dipindah
+import Peta from './features/dashboard/Peta';         // Jalur baru setelah dipindah
+import Simpan from './features/dashboard/Simpan';
+import Profil from './features/dashboard/Profil';
+import Auth from './features/auth/Auth';
+import DetailCafe from './DetailCafe';
+import PublicPeta from './features/public/PublicPeta';
 
 const CAFE_DATA = [
   {
@@ -26,65 +29,43 @@ const CAFE_DATA = [
     mapsLink: "https://maps.google.com",
     description: "Cafe estetik dengan pemandangan langit sore yang indah. Pilihan playlist lagunya selalu asik.",
     reviews: [{ user: "Fajar", rating: 5, comment: "View senjanya dapet banget!" }]
-  },
-  {
-    id: 3,
-    name: "Titik Kumpul 🌿",
-    image: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=600&q=80",
-    info: "⭐️ 4.9 | 🚗 5.0 km | 💰 Rp 25k - 60k",
-    address: "Jl. Sukabumi Raya No.88, Bogor",
-    mapsLink: "https://maps.google.com",
-    description: "Konsep semi-outdoor dengan pepohonan hijau di sekelilingnya. Vibes alamnya dapet banget.",
-    reviews: [{ user: "Bagas", rating: 5, comment: "Cocok buat healing akhir pekan." }]
-  },
-  {
-    id: 4,
-    name: "Ruang Seduh 📖",
-    image: "https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=600&q=80",
-    info: "⭐️ 4.6 | 🚗 2.1 km | 💰 Rp 18k - 40k",
-    address: "Jl. Baru No.10, Bogor Barat",
-    mapsLink: "https://maps.google.com",
-    description: "Cafe bertema perpustakaan mini yang sangat hening. Menyediakan banyak buku bacaan seru.",
-    reviews: [{ user: "Dina", rating: 4, comment: "Nugas di sini auto kelar tanpa gangguan." }]
   }
 ];
 
-// KOMPONEN SIDEBAR KHUSUS DESKTOP
-const Sidebar = ({ currentPage, onNavigate }) => {
+const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
   return (
     <aside className="sidebar-desktop">
       <div className="sidebar-brand">
         <h2>Nongkrongyuk</h2>
       </div>
       <nav className="sidebar-menu">
-        <div 
-          className={`sidebar-item ${currentPage === 'beranda' ? 'active' : ''}`} 
-          onClick={() => onNavigate('beranda')}
-        >
-          <span className="sidebar-icon">🏠</span>
-          <span>Beranda</span>
+        <div className={`sidebar-item ${currentPage === 'beranda' ? 'active' : ''}`} onClick={() => onNavigate('beranda')}>
+          <span className="sidebar-icon">🏠</span><span>Beranda</span>
         </div>
-        <div 
-          className={`sidebar-item ${currentPage === 'peta' ? 'active' : ''}`} 
-          onClick={() => onNavigate('peta')}
-        >
-          <span className="sidebar-icon">🗺️</span>
-          <span>Peta Lokasi</span>
-        </div>
-        <div 
-          className={`sidebar-item ${currentPage === 'simpan' ? 'active' : ''}`} 
-          onClick={() => onNavigate('simpan')}
-        >
-          <span className="sidebar-icon">🔖</span>
-          <span>Disimpan</span>
-        </div>
-        <div 
-          className={`sidebar-item ${currentPage === 'profil' ? 'active' : ''}`} 
-          onClick={() => onNavigate('profil')}
-        >
-          <span className="sidebar-icon">👤</span>
-          <span>Profil Saya</span>
-        </div>
+
+        {/* MENU PETA, SIMPAN, PROFIL HANYA MUNCUL JIKA USER LOGGED IN */}
+        {isLoggedIn && (
+          <>
+            <div className={`sidebar-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => onNavigate('peta')}>
+              <span className="sidebar-icon">🗺️</span><span>Peta Lokasi</span>
+            </div>
+            <div className={`sidebar-item ${currentPage === 'simpan' ? 'active' : ''}`} onClick={() => onNavigate('simpan')}>
+              <span className="sidebar-icon">🔖</span><span>Disimpan</span>
+            </div>
+            <div className={`sidebar-item ${currentPage === 'profil' ? 'active' : ''}`} onClick={() => onNavigate('profil')}>
+              <span className="sidebar-icon">👤</span><span>Profil Saya</span>
+            </div>
+            <div className="sidebar-item logout-item-sidebar" onClick={onLogout} style={{ marginTop: 'auto', color: '#FF5252' }}>
+              <span className="sidebar-icon">🚪</span><span>Keluar Akun</span>
+            </div>
+          </>
+        )}
+
+        {!isLoggedIn && (
+          <div className="sidebar-item login-btn-sidebar" onClick={() => onNavigate('auth')} style={{ marginTop: 'auto' }}>
+            <span className="sidebar-icon">🔑</span><span>Masuk / Daftar</span>
+          </div>
+        )}
       </nav>
     </aside>
   );
@@ -97,6 +78,7 @@ export default function App() {
   const [savedCafes, setSavedCafes] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
   const [isToastHiding, setIsToastHiding] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
@@ -107,9 +89,7 @@ export default function App() {
     setToastMessage(message);
     setTimeout(() => {
       setIsToastHiding(true);
-      setTimeout(() => {
-        setToastMessage(null);
-      }, 300);
+      setTimeout(() => { setToastMessage(null); }, 300);
     }, 2500); 
   };
 
@@ -117,10 +97,10 @@ export default function App() {
     e.stopPropagation(); 
     setSavedCafes((prev) => {
       if (prev.includes(id)) {
-        showToast("Dibuang dari senarai Simpan 🗑️");
+        showToast("Dibuang dari daftar Simpan 🗑️");
         return prev.filter(cafeId => cafeId !== id); 
       } else {
-        showToast("Berjaya disimpan! ❤️");
+        showToast("Berhasil disimpan!");
         return [...prev, id]; 
       }
     });
@@ -136,6 +116,12 @@ export default function App() {
     navigateTo('detail');
   };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    navigateTo('beranda');
+    showToast("Kamu telah keluar akun");
+  };
+
   const activeCafe = CAFE_DATA.find(cafe => cafe.id === selectedCafeId);
 
   return (
@@ -146,33 +132,39 @@ export default function App() {
         </div>
       )}
 
-      {/* STRUKTUR TATA LETAK UTAMA */}
       <div className="main-layout">
-        {/* Sidebar dipasang di sini, CSS yang akan mengatur persembunyiannya di HP */}
-        <Sidebar currentPage={currentPage} onNavigate={navigateTo} />
+        <Sidebar currentPage={currentPage} onNavigate={navigateTo} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
 
-        {/* Konten Halaman Aktif */}
         <div className="page-content-wrapper">
+          {/* LOGIKA KONDISIONAL: LOGGED IN VS PUBLIC GUEST */}
           {currentPage === 'beranda' && (
-            <Beranda 
-              isDarkMode={isDarkMode} 
-              setIsDarkMode={setIsDarkMode} 
-              cafeData={CAFE_DATA}
-              savedCafes={savedCafes}
-              onCafeClick={handleNavigateToDetail}
-              onToggleSave={handleToggleSave}
-              onNavigate={navigateTo}
-            />
+            isLoggedIn ? (
+              <Beranda 
+                isDarkMode={isDarkMode} 
+                setIsDarkMode={setIsDarkMode} 
+                cafeData={CAFE_DATA}
+                savedCafes={savedCafes}
+                onCafeClick={handleNavigateToDetail}
+                onToggleSave={handleToggleSave}
+                onNavigate={navigateTo}
+                isLoggedIn={isLoggedIn}
+              />
+            ) : (
+              <LandingPage 
+                isDarkMode={isDarkMode} 
+                setIsDarkMode={setIsDarkMode} 
+                cafeData={CAFE_DATA}
+                onNavigate={navigateTo}
+                showToast={showToast} // Oper fungsi toast ke LandingPage
+              />
+            )
           )}
           
-          {currentPage === 'detail' && (
-            <DetailCafe 
-              cafe={activeCafe} 
-              onBack={() => navigateTo('beranda')} 
-            />
+          {currentPage === 'detail' && isLoggedIn && (
+            <DetailCafe cafe={activeCafe} onBack={() => navigateTo('beranda')} />
           )}
 
-          {currentPage === 'simpan' && (
+          {currentPage === 'simpan' && isLoggedIn && (
             <Simpan 
               isDarkMode={isDarkMode} 
               setIsDarkMode={setIsDarkMode} 
@@ -185,20 +177,25 @@ export default function App() {
           )}
 
           {currentPage === 'peta' && (
-            <Peta 
-              isDarkMode={isDarkMode} 
-              setIsDarkMode={setIsDarkMode} 
-              onNavigate={navigateTo}
-            />
+            isLoggedIn ? (
+              <Peta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} />
+            ) : (
+              <PublicPeta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} />
+            )
           )}
 
-          {currentPage === 'profil' && (
+          {currentPage === 'profil' && isLoggedIn && (
             <Profil 
               isDarkMode={isDarkMode} 
               setIsDarkMode={setIsDarkMode} 
               onNavigate={navigateTo}
               savedCount={savedCafes.length} 
+              onLogout={handleLogout}
             />
+          )}
+
+          {currentPage === 'auth' && (
+            <Auth onLoginSuccess={() => { setIsLoggedIn(true); navigateTo('beranda'); showToast("Selamat datang kembali! 🎉"); }} />
           )}
         </div>
       </div>
