@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCount }) {
+export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCount, onLogout }) {
   return (
     <div className="animate-fade-in profile-page">
       {/* Header Profil dengan posisi relative agar tombol back bisa menempel di pojok kiri atas */}
