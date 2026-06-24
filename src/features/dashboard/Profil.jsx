@@ -1,88 +1,72 @@
+// src/features/dashboard/Profil.jsx
 import React from 'react';
+import { auth } from '../../config/firebase';
 
-export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCount, onLogout }) {
+export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCount, reviewCount, onLogout }) {
+  const currentUser = auth.currentUser; // Mengambil data user aktif
+
   return (
-    <div className="animate-fade-in profile-page">
-      {/* Header Profil dengan posisi relative agar tombol back bisa menempel di pojok kiri atas */}
-      <div className="profile-header-large" style={{ position: 'relative' }}>
+    <div className="profile-page anonymity animate-fade-in" style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
+      <header style={{ marginBottom: '30px' }}>
+        <h2>Profil Saya 👤</h2>
+      </header>
+
+      <main style={{ textAlign: 'center' }}>
+        <img 
+          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" 
+          alt="Avatar" 
+          style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #0084ff' }}
+        />
         
-        {/* Tombol Kembali ke Beranda (Penyelamat user laptop/desktop) */}
-        <button 
-          className="btn-back" 
-          onClick={() => onNavigate('beranda')}
-          style={{ position: 'absolute', top: '20px', left: '20px' }}
-        >
-          ⬅️ Beranda
-        </button>
+        {/* Menampilkan Nama Asli yang didaftarkan ke Firebase */}
+        <h2 style={{ marginTop: '15px' }}>{currentUser?.displayName || 'User Kece'}</h2>
+        <p style={{ opacity: 0.7, marginTop: '-5px' }}>{currentUser?.email}</p>
 
-        {/* Bingkai Foto Profil Bulat Besar */}
-        <div className="avatar-large">
-          <img 
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" 
-            alt="Foto Profil Besar" 
-            className="profile-img-large" 
-          />
-        </div>
-        
-        {/* Nama dan info user yang sempat hilang */}
-        <h2 className="profile-name">Si Paling WFC</h2>
-        <p className="profile-email">nongkrong.teruss@gmail.com</p>
-      </div>
-
-      <div className="profile-content">
-        {/* Statistik Dummy */}
-        <div className="profile-stats">
-          <div className="stat-box" onClick={() => onNavigate('simpan')}>
-            <h3>{savedCount}</h3>
-            <p>Disimpan</p>
+        {/* 📊 KARTU STATISTIK REAL-TIME */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', margin: '30px 0' }}>
+          <div style={{ padding: '15px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '12px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+            <h3 style={{ margin: 0, fontSize: '24px', color: '#FF5252' }}>{savedCount}</h3>
+            <p style={{ margin: '5px 0 0 0', fontSize: '14px', opacity: 0.8 }}>Disimpan 🔖</p>
           </div>
-          <div className="stat-box">
-            <h3>12</h3>
-            <p>Ulasan</p>
-          </div>
-          <div className="stat-box">
-            <h3>Level 3</h3>
-            <p>Member</p>
+          <div style={{ padding: '15px', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '12px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+            {/* 🌟 Angka Ulasan Real-time */}
+            <h3 style={{ margin: 0, fontSize: '24px', color: '#0084ff' }}>{reviewCount}</h3>
+            <p style={{ margin: '5px 0 0 0', fontSize: '14px', opacity: 0.8 }}>Ulasan Ditulis 💬</p>
           </div>
         </div>
 
-        {/* Menu Pengaturan */}
-        <div className="settings-container">
-          <h3 className="settings-title">Pengaturan Aplikasi</h3>
-          
-          <div className="setting-item" onClick={() => setIsDarkMode(!isDarkMode)}>
-            <div className="setting-info">
-              <span className="setting-icon">{isDarkMode ? '🌙' : '☀️'}</span>
-              <span>Tema Gelap (Dark Mode)</span>
-            </div>
-            <span className="setting-status">{isDarkMode ? 'Aktif' : 'Mati'}</span>
-          </div>
-
-          <div className="setting-item" onClick={() => alert('Fitur Edit Profil segera hadir!')}>
-            <div className="setting-info">
-              <span className="setting-icon">✏️</span>
-              <span>Edit Profil</span>
-            </div>
-            <span className="setting-arrow">➡️</span>
-          </div>
-
-          <div className="setting-item" onClick={() => alert('Fitur Bantuan segera hadir!')}>
-            <div className="setting-info">
-              <span className="setting-icon">❓</span>
-              <span>Pusat Bantuan</span>
-            </div>
-            <span className="setting-arrow">➡️</span>
-          </div>
-
-          {/* Ganti baris ini di file Profil.jsx kamu */}
-          <div className="setting-item logout-item" onClick={onLogout}>
-            <div className="setting-info">
-              <span className="setting-icon">🚪</span>
-              <span>Keluar Akun</span>
-            </div>
-          </div>
+        {/* PENGATURAN TEMA & LOGOUT */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px' }}>
+          <button 
+            onClick={() => setIsDarkMode(!isDarkMode)} 
+            style={{ padding: '12px', borderRadius: '8px', cursor: 'pointer', border: '1px solid #ccc', fontWeight: 'bold' }}
+          >
+            Mode {isDarkMode ? '☀️ Terang' : '🌙 Gelap'}
+          </button>
+          <button 
+            onClick={onLogout} 
+            style={{ padding: '12px', borderRadius: '8px', cursor: 'pointer', backgroundColor: '#FF5252', color: 'white', border: 'none', fontWeight: 'bold' }}
+          >
+            Keluar Akun 🚪
+          </button>
         </div>
-      </div>
+      </main>
+
+      {/* BOTTOM BAR DASHBOARD VIP */}
+      <nav className="bottom-bar">
+        <div className="nav-item" onClick={() => onNavigate('beranda')}>
+          <span className="nav-icon">🏠</span><span>Beranda</span>
+        </div>
+        <div className="nav-item" onClick={() => onNavigate('peta')}>
+          <span className="nav-icon">🗺️</span><span>Peta</span>
+        </div>
+        <div className="nav-item" onClick={() => onNavigate('simpan')}>
+          <span className="nav-icon">🔖</span><span>Simpan</span>
+        </div>
+        <div className="nav-item" onClick={() => onNavigate('profil')} style={{ color: 'var(--text-main)' }}>
+          <span className="nav-icon">👤</span><span>Profil</span>
+        </div>
+      </nav>
     </div>
   );
 }
