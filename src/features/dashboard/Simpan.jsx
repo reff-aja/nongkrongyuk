@@ -20,7 +20,7 @@ const CafeCard = ({ cafe, onClick, isSaved, onToggleSave }) => {
   );
 };
 
-export default function Simpan({ isDarkMode, setIsDarkMode, cafeData, savedCafes, onCafeClick, onToggleSave, onNavigate }) {
+export default function Simpan({ isDarkMode, setIsDarkMode, cafeData, savedCafes, onCafeClick, onToggleSave, onNavigate, currentUser }) {
   
   // Tapis hanya data kafe yang ada dalam senarai savedCafes
   const savedCafeData = cafeData.filter(cafe => savedCafes.includes(cafe.id));
@@ -45,9 +45,10 @@ export default function Simpan({ isDarkMode, setIsDarkMode, cafeData, savedCafes
               {/* Tombol ganti tema sengaja dihilangkan dari header karena sudah dipindah ke halaman Profil */}
               <button className="profile-menu" onClick={() => onNavigate('profil')}>
                 <img 
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" 
-                  alt="Foto Profil" 
-                  className="profile-img" 
+                  src={currentUser?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"} 
+                  alt="Avatar" 
+                  className="avatar-header" 
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} 
                 />
               </button>
             </div>

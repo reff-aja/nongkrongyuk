@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import 'leaflet/dist/leaflet.css';
 
 // Import Komponen & Data
 import LandingPage from './features/public/LandingPage';
@@ -67,7 +68,7 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false); 
   const [currentUser, setCurrentUser] = useState(null); 
-  const [reviewCount, setReviewCount] = useState(0); // 👈 State untuk jumlah ulasan
+  const [reviewCount, setReviewCount] = useState(0);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
@@ -208,6 +209,7 @@ export default function App() {
                 onCafeClick={handleNavigateToDetail}
                 onToggleSave={handleToggleSave}
                 onNavigate={navigateTo}
+                currentUser={currentUser}
               />
             ) : (
               <LandingPage 
@@ -233,12 +235,13 @@ export default function App() {
               onCafeClick={handleNavigateToDetail}
               onToggleSave={handleToggleSave}
               onNavigate={navigateTo}
+              currentUser={currentUser}
             />
           )}
 
           {currentPage === 'peta' && (
             isLoggedIn ? (
-              <Peta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} />
+              <Peta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} currentUser={currentUser} />
             ) : (
               <PublicPeta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} />
             )

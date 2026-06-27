@@ -1,48 +1,53 @@
 import React from 'react';
 
-export default function Peta({ isDarkMode, setIsDarkMode, onNavigate }) {
+export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUser }) {
+  
   return (
-    <div className="map-page animate-fade-in">
-      <header>
-        <div className="header-content">
-          <div className="header-top">
-            <div className="header-brand">
-              <h1 className="title">Peta Lokasi Cafe 🗺️</h1>
-              <span className="location">Cari spot terdekat dari posisimu</span>
-            </div>
-            <div className="header-actions">
-              <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
-                {isDarkMode ? '🌙' : '☀️'}
-              </button>
-              
-              {/* PASTI SUDAH LOGIN: Langsung tampilkan foto profil bulat */}
-              <button className="profile-menu" onClick={() => onNavigate('profil')}>
-                <img 
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" 
-                  alt="Foto Profil" 
-                  className="profile-img" 
-                />
-              </button>
-            </div>
+    <div className="map-page anonymity animate-fade-in">
+      
+      {/* 📋 TOP BAR / HEADER */}
+      <header style={{ padding: '10px 20px', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+        <div className="header-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className="header-brand">
+            <h1 className="title" style={{ margin: 0, fontSize: '24px' }}>Peta Lokasi 🗺️</h1>
+            <span className="location" style={{ opacity: 0.7, fontSize: '14px' }}>
+              Jelajahi Cafe Terdekat
+            </span>
+          </div>
+          
+          <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <button 
+              onClick={() => setIsDarkMode(!isDarkMode)} 
+              style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}
+            >
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
+            <img 
+              src={currentUser?.photoURL || "https://placehold.co/150"} 
+              alt="Avatar" 
+              style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #0084ff', cursor: 'pointer' }}
+              onClick={() => onNavigate('profil')}
+            />
           </div>
         </div>
       </header>
 
-      {/* AREA GOOGLE MAPS */}
-      <main className="map-container">
+      {/* 🗺️ AREA PETA GOOGLE MAPS (PALING AMAN) */}
+      <main className="map-container" style={{ height: 'calc(100vh - 140px)', width: '100%', position: 'relative' }}>
         <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15852.923893815043!2d106.7441584!3d-6.6182143!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c5950d890d7b%3A0x401576d14ebd120!2sCiomas%2C%20Bogor%20Regency%2C%20West%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid" 
+          // Link embed Google Maps ini akan otomatis menampilkan area Bogor
+          src="https://maps.google.com/maps?q=Bogor&t=&z=13&ie=UTF8&iwloc=&output=embed" 
           width="100%" 
           height="100%" 
           style={{ border: 0 }} 
           allowFullScreen="" 
           loading="lazy" 
           referrerPolicy="no-referrer-when-downgrade"
-          title="Peta Ciomas"
+          title="Google Maps"
         ></iframe>
       </main>
 
-      {/* BOTTOM BAR DASHBOARD VIP (Selalu Tampil 4 Menu) */}
+      {/* 🧭 BOTTOM BAR MENU */}
       <nav className="bottom-bar">
         <div className="nav-item" onClick={() => onNavigate('beranda')}>
           <span className="nav-icon">🏠</span><span>Beranda</span>
@@ -57,6 +62,7 @@ export default function Peta({ isDarkMode, setIsDarkMode, onNavigate }) {
           <span className="nav-icon">👤</span><span>Profil</span>
         </div>
       </nav>
+
     </div>
   );
 }

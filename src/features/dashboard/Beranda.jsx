@@ -21,7 +21,7 @@ const CafeCard = ({ cafe, onClick, isSaved, onToggleSave }) => {
 };
 
 // Tidak perlu lagi menerima props 'isLoggedIn'
-export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafes, onCafeClick, onToggleSave, onNavigate }) {
+export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafes, onCafeClick, onToggleSave, onNavigate, currentUser, selectedCity, setSelectedCity }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCafes = cafeData.filter((cafe) => {
@@ -35,7 +35,9 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
           <div className="header-top">
             <div className="header-brand">
               <h1 className="title">Enaknya nongkrong dimana nih?</h1>
-              <span className="location">📍 Ciomas, Bogor</span>
+            </div>
+            <div className="filter-container" style={{ margin: '15px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '20px' }}>📍</span>
             </div>
             <div className="header-actions">
               <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
@@ -45,9 +47,10 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
               {/* PASTI SUDAH LOGIN: Langsung tampilkan foto profil */}
               <button className="profile-menu" onClick={() => onNavigate('profil')}>
                 <img 
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80" 
-                  alt="Foto Profil" 
-                  className="profile-img" 
+                  src={currentUser?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"} 
+                  alt="Avatar" 
+                  className="avatar-header" // ganti sesuai nama class di css berandamu
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} // opsional biar rapi bulat berbentuk avatar
                 />
               </button>
             </div>

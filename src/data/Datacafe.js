@@ -6,7 +6,8 @@ export const CAFE_DATA = [
     name: "Ngopi-yuk ☕",
     image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80",
     info: "⭐️ 4.8 | 🚗 1.5 km | 💰 Rp 20k - 50k",
-    address: "Jl. Raya Ciomas No.123, Bogor",
+    city: "Ciomas, Bogor",
+    address: "Jl. Raya Ciomas No.1",
     mapsLink: "https://maps.google.com",
     description: "Tempat nongkrong super cozy dengan interior kayu yang hangat. Wi-Fi sangat stabil, banyak colokan di setiap meja.",
     reviews: [{ user: "Rian", rating: 5, comment: "Kopi susunya mantap!" }]
@@ -16,7 +17,8 @@ export const CAFE_DATA = [
     name: "Sudut Senja 🌅",
     image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=600&q=80",
     info: "⭐️ 4.5 | 🚗 3.2 km | 💰 Rp 15k - 35k",
-    address: "Jl. Pajajaran Indah No.45, Bogor",
+    city: "Depok, Jawa Barat",
+    address: "Jl. Pajajaran Indah No.45",
     mapsLink: "https://maps.google.com",
     description: "Cafe estetik dengan pemandangan langit sore yang indah. Pilihan playlist lagunya selalu asik.",
     reviews: [{ user: "Fajar", rating: 5, comment: "View senjanya dapet banget!" }]
