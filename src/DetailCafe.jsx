@@ -77,7 +77,9 @@ export default function DetailCafe({ cafe, onBack }) {
         <img src={cafe.image} alt={cafe.name} style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: '12px' }} />
         <h1 style={{ marginTop: '15px' }}>{cafe.name}</h1>
         <p style={{ opacity: 0.8 }}>{cafe.address}</p>
-        <p>{cafe.info}</p>
+        <p>
+          {cafe.shortInfo || cafe.info || "⭐️ 0.0 | No Info"}
+        </p>
       </div>
 
       <div className="detail-body" style={{ marginTop: '20px' }}>

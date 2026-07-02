@@ -9,7 +9,7 @@ export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUse
       <header style={{ padding: '10px 20px', borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
         <div className="header-content" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div className="header-brand">
-            <h1 className="title" style={{ margin: 0, fontSize: '24px' }}>Peta Lokasi 🗺️</h1>
+            <h1 className="title" style={{ margin: 0, fontSize: '24px' }}>Peta Lokasi</h1>
             <span className="location" style={{ opacity: 0.7, fontSize: '14px' }}>
               Jelajahi Cafe Terdekat
             </span>

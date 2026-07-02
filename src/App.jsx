@@ -11,10 +11,10 @@ import Simpan from './features/dashboard/Simpan';
 import Profil from './features/dashboard/Profil';
 import Auth from './features/auth/Auth';
 import DetailCafe from './DetailCafe';
-import { CAFE_DATA } from './data/Datacafe';
 import Toast from './component/Toast';
+import Admin from './features/dashboard/Admin';
 
-// 👇 Import Firebase Auth, Firestore, dan Jembatan Firebase kita
+// 👇 Import Firebase Auth, Firestore
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, deleteDoc, collection } from 'firebase/firestore'; 
 import { auth, db } from './config/firebase'; 
@@ -70,11 +70,14 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null); 
   const [reviewCount, setReviewCount] = useState(0);
 
+  // 🚀 STATE BARU: Penampung data cafe asli dari Firebase
+  const [cafes, setCafes] = useState([]);
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  // 🚀 1. MANTRA FIREBASE AUTH: Menjaga sesi login & menangkap data User
+  // 1. MANTRA FIREBASE AUTH
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -83,20 +86,18 @@ export default function App() {
       } else {
         setIsLoggedIn(false);
         setCurrentUser(null);
-        setSavedCafes([]); // Reset data saat logout
-        setReviewCount(0); // Reset ulasan saat logout
+        setSavedCafes([]); 
+        setReviewCount(0); 
       }
       setIsAuthReady(true); 
     });
-
     return () => unsubscribe();
   }, []);
 
-  // 🗄️ 2. MANTRA FIRESTORE: Sync Real-time Bookmark & Jumlah Ulasan
+  // 2. MANTRA FIRESTORE USER DATA (Bookmarks & Profil)
   useEffect(() => {
-    if (!currentUser) return; // Kalau belum login, jangan jalankan
+    if (!currentUser) return; 
 
-    // A. Listener untuk Bookmark (Love)
     const bookmarksRef = collection(db, 'users', currentUser.uid, 'bookmarks');
     const unsubscribeBookmarks = onSnapshot(bookmarksRef, (snapshot) => {
       const listIds = snapshot.docs.map(doc => parseInt(doc.id)); 
@@ -105,11 +106,10 @@ export default function App() {
       console.error("Gagal memuat bookmarks:", error);
     });
 
-    // B. Listener untuk Jumlah Ulasan di Profil
     const userDocRef = doc(db, 'users', currentUser.uid);
     const unsubscribeUserDoc = onSnapshot(userDocRef, (snapshot) => {
       if (snapshot.exists()) {
-        setReviewCount(snapshot.data().reviewCount || 0); // Ambil angka real-time
+        setReviewCount(snapshot.data().reviewCount || 0); 
       } else {
         setReviewCount(0);
       }
@@ -117,12 +117,26 @@ export default function App() {
       console.error("Gagal memuat data profil user:", error);
     });
 
-    // Bersihkan listener kalau user pindah halaman/logout
     return () => {
       unsubscribeBookmarks();
       unsubscribeUserDoc();
     };
   }, [currentUser]);
+
+  // 🚀 3. MANTRA BARU: Dengerin koleksi 'cafes' di Firebase secara Real-time!
+  useEffect(() => {
+    const cafesCollectionRef = collection(db, 'cafes');
+    const unsubscribeCafes = onSnapshot(cafesCollectionRef, (snapshot) => {
+      const dataDariFirebase = snapshot.docs.map(doc => ({
+        ...doc.data() // Mengambil data id, name, image, shortInfo, dll
+      }));
+      setCafes(dataDariFirebase);
+    }, (error) => {
+      console.error("Gagal mengambil data cafe dari Firebase:", error);
+    });
+
+    return () => unsubscribeCafes();
+  }, []);
 
   const showToast = (message) => {
     setIsToastHiding(false);
@@ -133,7 +147,6 @@ export default function App() {
     }, 2500); 
   };
 
-  // ❤️ 3. UPDATE LOGIKA TOMBOL LOVE: Kirim & Hapus Data langsung ke Cloud Server
   const handleToggleSave = async (id, e) => {
     e.stopPropagation(); 
     if (!currentUser) return;
@@ -181,7 +194,8 @@ export default function App() {
     }
   };
 
-  const activeCafe = CAFE_DATA.find(cafe => cafe.id === selectedCafeId);
+  // Mencari cafe aktif berdasarkan data dari Firebase
+  const activeCafe = cafes.find(cafe => cafe.id === selectedCafeId);
 
   if (!isAuthReady) {
     return (
@@ -196,7 +210,10 @@ export default function App() {
       <Toast message={toastMessage} isHiding={isToastHiding} />
 
       <div className="main-layout">
-        <Sidebar currentPage={currentPage} onNavigate={navigateTo} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+        
+        {currentPage !== 'admin' && (
+          <Sidebar currentPage={currentPage} onNavigate={navigateTo} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+        )}
 
         <div className="page-content-wrapper">
           {currentPage === 'beranda' && (
@@ -204,7 +221,7 @@ export default function App() {
               <Beranda 
                 isDarkMode={isDarkMode} 
                 setIsDarkMode={setIsDarkMode} 
-                cafeData={CAFE_DATA}
+                cafeData={cafes} // 🚀 Sekarang pake data asli Firebase
                 savedCafes={savedCafes}
                 onCafeClick={handleNavigateToDetail}
                 onToggleSave={handleToggleSave}
@@ -215,7 +232,7 @@ export default function App() {
               <LandingPage 
                 isDarkMode={isDarkMode} 
                 setIsDarkMode={setIsDarkMode} 
-                cafeData={CAFE_DATA}
+                cafeData={cafes} // 🚀 Sekarang pake data asli Firebase
                 onNavigate={navigateTo}
                 showToast={showToast} 
               />
@@ -230,7 +247,7 @@ export default function App() {
             <Simpan 
               isDarkMode={isDarkMode} 
               setIsDarkMode={setIsDarkMode} 
-              cafeData={CAFE_DATA}
+              cafeData={cafes} // 🚀 Sekarang pake data asli Firebase
               savedCafes={savedCafes}
               onCafeClick={handleNavigateToDetail}
               onToggleSave={handleToggleSave}
@@ -253,13 +270,23 @@ export default function App() {
               setIsDarkMode={setIsDarkMode} 
               onNavigate={navigateTo}
               savedCount={savedCafes.length}
-              reviewCount={reviewCount} // 👈 4. Angka ulasannya udah nggak nol lagi!
+              reviewCount={reviewCount} 
               onLogout={handleLogout}
             />
           )}
 
           {currentPage === 'auth' && (
             <Auth onLoginSuccess={() => { navigateTo('beranda'); showToast("Selamat datang kembali! 🎉"); }} />
+          )}
+
+          {currentPage === 'admin' && isLoggedIn && (
+            <Admin 
+              isDarkMode={isDarkMode} 
+              setIsDarkMode={setIsDarkMode} 
+              onNavigate={navigateTo} 
+              currentUser={currentUser}
+              cafeData={cafes} // 🚀 Sekarang pake data asli Firebase
+            />
           )}
         </div>
       </div>

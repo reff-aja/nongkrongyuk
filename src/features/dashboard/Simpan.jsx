@@ -37,7 +37,7 @@ export default function Simpan({ isDarkMode, setIsDarkMode, cafeData, savedCafes
                 style={{ cursor: 'pointer' }}
                 title="Kembali ke Beranda"
               >
-                Disimpan 🔖
+                Disimpan
               </h1>
               <span className="location">Koleksi Tempat Favoritmu</span>
             </div>

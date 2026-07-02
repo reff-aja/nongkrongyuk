@@ -952,3 +952,113 @@ header {
   color: var(--text-main);
   border: 1px solid rgba(0,0,0,0.05);
 }
+
+.btn-admin-vip {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(118, 75, 162, 0.4);
+  transition: transform 0.2s;
+}
+
+.btn-admin-vip:hover {
+  transform: scale(1.02);
+}
+
+/* =========================================
+   MODAL ADMIN - FORM TAMBAH CAFE
+   ========================================= */
+.admin-modal-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.admin-modal-card {
+  background-color: #1a1a1a; /* Kartu Hitam Elegan */
+  padding: 30px;
+  border-radius: 15px;
+  width: 400px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-modal-title {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #667eea;
+}
+
+.admin-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.admin-modal-input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: transparent;
+  color: #ffffff; /* Teks putih biar kontras */
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.admin-modal-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-modal-input:focus {
+  border-color: #667eea;
+}
+
+.admin-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.admin-btn-save {
+  flex: 1;
+  padding: 12px;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.admin-btn-save:hover {
+  background-color: #5a6fe0;
+}
+
+.admin-btn-cancel {
+  flex: 1;
+  padding: 12px;
+  background-color: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.admin-btn-cancel:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

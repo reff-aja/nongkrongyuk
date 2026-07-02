@@ -14,7 +14,9 @@ const CafeCard = ({ cafe, onClick, isSaved, onToggleSave }) => {
       </div>
       <div className="card-content">
         <h3 className="card-title">{cafe.name}</h3>
-        <p className="card-info">{cafe.info}</p>
+        <p className="card-info">
+          {cafe.shortInfo || cafe.info || "⭐️ 0.0 | No Info"}
+        </p>
       </div>
     </div>
   );
@@ -35,9 +37,6 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
           <div className="header-top">
             <div className="header-brand">
               <h1 className="title">Enaknya nongkrong dimana nih?</h1>
-            </div>
-            <div className="filter-container" style={{ margin: '15px 0', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '20px' }}>📍</span>
             </div>
             <div className="header-actions">
               <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
