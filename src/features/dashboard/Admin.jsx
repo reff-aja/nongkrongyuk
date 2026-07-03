@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// 👇 Tambahkan fungsi updateDoc dan deleteDoc dari Firestore
+// Import fungsi mutasi Firestore
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 
@@ -7,7 +7,7 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  // 🚀 STATE BARU: Menandai apakah sedang dalam mode EDIT atau TAMBAH BARU
+  // State penanda mode EDIT atau TAMBAH BARU
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingCafeId, setEditingCafeId] = useState(null);
 
@@ -21,7 +21,7 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
     description: ''
   });
 
-  // 🚀 FUNGSI MEMBUKA MODAL UNTUK TAMBAH BARU
+  // Fungsi membuka modal untuk TAMBAH BARU
   const openAddModal = () => {
     setIsEditMode(false);
     setEditingCafeId(null);
@@ -31,14 +31,14 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
     setIsModalOpen(true);
   };
 
-  // 🚀 FUNGSI MEMBUKA MODAL UNTUK EDIT DATA LAMA
+  // Fungsi membuka modal untuk EDIT DATA
   const openEditModal = (cafe) => {
     setIsEditMode(true);
-    setEditingCafeId(cafe.id); // Menyimpan ID cafe yang mau diedit
+    setEditingCafeId(cafe.id);
     setFormData({
       name: cafe.name || '',
       image: cafe.image || '',
-      shortInfo: cafe.shortInfo || cafe.info || '', // Adaptif baca shortInfo atau info lama
+      shortInfo: cafe.shortInfo || cafe.info || '',
       city: cafe.city || '',
       address: cafe.address || '',
       mapsLink: cafe.mapsLink || '',
@@ -47,16 +47,12 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
     setIsModalOpen(true);
   };
 
-  // 🚀 FUNGSI SUBMIT FORM (BISA UNTUK TAMBAH MAUPUN EDIT)
+  // Fungsi submit form (Tambah / Edit)
   const handleSaveCafe = async (e) => {
     e.preventDefault(); 
 
     if (isEditMode && editingCafeId) {
-      // 📝 LOGIKA JURUS EDIT DATA
       try {
-        // Cari ID dokumen di Firebase (kita cari berdasarkan kecocokan ID angka cafe tersebut)
-        // Catatan: Karena dokumen disimpan dengan ID waktu string, kita cari tahu lewat pencarian, 
-        // atau jika ID dokumennya sama dengan ID angka, kita tembak langsung.
         const cafeIdStr = editingCafeId.toString();
         const cafeDocRef = doc(db, 'cafes', cafeIdStr);
 
@@ -73,7 +69,6 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
         alert('📝 Mantap! Perubahan data cafe berhasil diperbarui ke Firebase!');
         setIsModalOpen(false);
       } catch (error) {
-        // Jika dokumen lama menggunakan ID kustom acak dari Firebase, kita timpa atau fallback pakai setDoc
         try {
           const cafeIdStr = editingCafeId.toString();
           await setDoc(doc(db, 'cafes', cafeIdStr), {
@@ -94,7 +89,6 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
         }
       }
     } else {
-      // ➕ LOGIKA TAMBAH BARU (KODE LAMA LU YANG SUDAH JALAN)
       const cafeIdStr = Date.now().toString();
       const newCafe = {
         id: Date.now(), 
@@ -118,13 +112,12 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
     }
   };
 
-  // 🚀 FUNGSI JURUS HAPUS DATA CAFE DARI FIREBASE
+  // Fungsi hapus data cafe
   const handleDeleteCafe = async (cafeId) => {
     const konfirmasi = window.confirm("🚨 Peringatan, Bro! Lu beneran mau menghapus cafe ini dari peradaban?");
     if (!konfirmasi) return;
 
     try {
-      // Tembak langsung hapus dokumen berdasarkan ID string-nya
       await deleteDoc(doc(db, 'cafes', cafeId.toString()));
       alert('🗑️ Bye! Cafe berhasil dihapus dari database selamanya!');
     } catch (error) {
@@ -133,58 +126,68 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', backgroundColor: 'var(--bg-main)', color: 'var(--text-main)', position: 'relative' }}>
+    // 🚀 SEKARANG STRUKTUR MURNI PAKAI CLASSNAME CSS LUAR
+    <div className="admin-panel-layout">
       
       {/* 📋 SIDEBAR ADMIN */}
-      <aside style={{ width: '250px', borderRight: '1px solid rgba(0,0,0,0.1)', padding: '20px', display: 'flex', flexDirection: 'column' }}>
-        <h2 style={{ fontSize: '20px', marginBottom: '30px', color: '#667eea' }}>Admin Panel</h2>
+      <aside className="admin-sidebar">
+        <h2 className="admin-sidebar-title">Admin Panel</h2>
         
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-          <button onClick={() => setActiveTab('dashboard')} style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', transition: '0.3s', backgroundColor: activeTab === 'dashboard' ? '#667eea' : 'transparent', color: activeTab === 'dashboard' ? 'white' : 'var(--text-main)' }}>
+        <nav className="admin-sidebar-nav">
+          <button 
+            onClick={() => setActiveTab('dashboard')} 
+            className={`admin-nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
+          >
             📊 Dashboard
           </button>
-          <button onClick={() => setActiveTab('kelolaCafe')} style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', transition: '0.3s', backgroundColor: activeTab === 'kelolaCafe' ? '#667eea' : 'transparent', color: activeTab === 'kelolaCafe' ? 'white' : 'var(--text-main)' }}>
+          <button 
+            onClick={() => setActiveTab('kelolaCafe')} 
+            className={`admin-nav-btn ${activeTab === 'kelolaCafe' ? 'active' : ''}`}
+          >
             ☕ Kelola Cafe
           </button>
-          <button onClick={() => setActiveTab('kelolaUser')} style={{ padding: '12px', textAlign: 'left', borderRadius: '8px', border: 'none', cursor: 'pointer', fontWeight: 'bold', transition: '0.3s', backgroundColor: activeTab === 'kelolaUser' ? '#667eea' : 'transparent', color: activeTab === 'kelolaUser' ? 'white' : 'var(--text-main)' }}>
+          <button 
+            onClick={() => setActiveTab('kelolaUser')} 
+            className={`admin-nav-btn ${activeTab === 'kelolaUser' ? 'active' : ''}`}
+          >
             👥 Kelola User
           </button>
         </nav>
 
-        <div style={{ marginTop: 'auto' }}>
-          <button onClick={() => onNavigate('beranda')} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: 'none', backgroundColor: '#ff4d4f', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>
+        <div className="admin-sidebar-footer">
+          <button onClick={() => onNavigate('beranda')} className="admin-btn-back">
             Kembali ke App
           </button>
         </div>
       </aside>
 
       {/* 🖥️ KONTEN UTAMA */}
-      <main style={{ flex: 1, padding: '30px', overflowY: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+      <main className="admin-main-content">
+        <div className="admin-main-header">
           <h1>
             {activeTab === 'dashboard' && 'Selamat Datang, Komandan!'}
             {activeTab === 'kelolaCafe' && 'Manajemen Data Cafe'}
             {activeTab === 'kelolaUser' && 'Manajemen Pengguna'}
           </h1>
-          <button onClick={() => setIsDarkMode(!isDarkMode)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>
+          <button onClick={() => setIsDarkMode(!isDarkMode)} className="admin-theme-toggle">
             {isDarkMode ? '☀️' : '🌙'}
           </button>
         </div>
 
         {/* --- TAB DASHBOARD --- */}
         {activeTab === 'dashboard' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px' }}>
-            <div style={{ padding: '20px', borderRadius: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
-              <h3 style={{ margin: 0, color: '#667eea' }}>Total Cafe</h3>
-              <h1 style={{ margin: '10px 0', fontSize: '36px' }}>{cafeData.length}</h1>
+          <div className="admin-dashboard-grid">
+            <div className="admin-stat-card card-total-cafe">
+              <h3>Total Cafe</h3>
+              <h1>{cafeData.length}</h1>
             </div>
-            <div style={{ padding: '20px', borderRadius: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
-              <h3 style={{ margin: 0, color: '#28a745' }}>Total User</h3>
-              <h1 style={{ margin: '10px 0', fontSize: '36px' }}>1</h1>
+            <div className="admin-stat-card card-total-user">
+              <h3>Total User</h3>
+              <h1>1</h1>
             </div>
-            <div style={{ padding: '20px', borderRadius: '10px', border: '1px solid #ccc', textAlign: 'center' }}>
-              <h3 style={{ margin: 0, color: '#ffc107' }}>Review</h3>
-              <h1 style={{ margin: '10px 0', fontSize: '36px' }}>
+            <div className="admin-stat-card card-total-reviews">
+              <h3>Review</h3>
+              <h1>
                 {cafeData.reduce((total, cafe) => total + (cafe.reviews?.length || 0), 0)}
               </h1>
             </div>
@@ -193,49 +196,40 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
 
         {/* --- TAB KELOLA CAFE --- */}
         {activeTab === 'kelolaCafe' && (
-          <div>
-            {/* Menggunakan pemicu openAddModal */}
-            <button onClick={openAddModal} style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginBottom: '20px' }}>
+          <div className="admin-kelola-cafe-section">
+            <button onClick={openAddModal} className="admin-btn-trigger-add">
               + Tambah Cafe Baru
             </button>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #ccc' }}>
-                  <th style={{ padding: '12px' }}>Nama Cafe</th>
-                  <th style={{ padding: '12px' }}>Kota</th>
-                  <th style={{ padding: '12px' }}>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cafeData.map((cafe) => (
-                  <tr key={cafe.id} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                    <td style={{ padding: '12px' }}>{cafe.name}</td>
-                    <td style={{ padding: '12px' }}>{cafe.city || 'Bogor'}</td>
-                    <td style={{ padding: '12px', gap: '10px', display: 'flex' }}>
-                      {/* 🚀 TOMBOL EDIT AKURAT */}
-                      <button 
-                        onClick={() => openEditModal(cafe)}
-                        style={{ padding: '6px 12px', backgroundColor: '#ffc107', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'black', fontWeight: 'bold' }}
-                      >
-                        Edit
-                      </button>
-                      {/* 🚀 TOMBOL HAPUS FIREBASE */}
-                      <button 
-                        onClick={() => handleDeleteCafe(cafe.id)}
-                        style={{ padding: '6px 12px', backgroundColor: '#ff4d4f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-                      >
-                        Hapus
-                      </button>
-                    </td>
+            
+            {/* Wrapper pembantu scrollbar otomatis di HP */}
+            <div className="admin-table-responsive-wrapper">
+              <table className="admin-data-table">
+                <thead>
+                  <tr>
+                    <th>Nama Cafe</th>
+                    <th>Kota</th>
+                    <th>Aksi</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {cafeData.map((cafe) => (
+                    <tr key={cafe.id}>
+                      <td className="cell-name">{cafe.name}</td>
+                      <td className="cell-city">{cafe.city || 'Bogor'}</td>
+                      <td className="cell-actions">
+                        <button onClick={() => openEditModal(cafe)} className="admin-btn-action-edit">Edit</button>
+                        <button onClick={() => handleDeleteCafe(cafe.id)} className="admin-btn-action-delete">Hapus</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
         {activeTab === 'kelolaUser' && (
-          <div style={{ padding: '20px', border: '1px dashed #ccc', borderRadius: '10px', textAlign: 'center' }}>
+          <div className="admin-empty-state">
             <p>Fitur manajemen user akan dikembangkan selanjutnya.</p>
           </div>
         )}
@@ -244,14 +238,12 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
       {/* 🚀 MODAL / POP-UP FORM TAMBAH & EDIT CAFE */}
       {isModalOpen && (
         <div className="admin-modal-overlay">
-          <div className="admin-modal-card" style={{ width: '500px' }}> 
-            {/* Judul modal dinamis mengikuti mode */}
+          <div className="admin-modal-card"> 
             <h2 className="admin-modal-title">
-              {isEditMode ? '📝 Edit Data Cafe' : '📝 Form Cafe Baru'}
+              {isEditMode ? 'Edit Data Cafe' : 'Form Cafe Baru'}
             </h2>
             
-            <form onSubmit={handleSaveCafe} className="admin-modal-form" style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: '10px' }}>
-              
+            <form onSubmit={handleSaveCafe} className="admin-modal-form">
               <input className="admin-modal-input" type="text" placeholder="Nama Cafe (Misal: Kopi Kenangan)" required
                 value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} 
               />
@@ -276,8 +268,7 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
                 value={formData.mapsLink} onChange={(e) => setFormData({...formData, mapsLink: e.target.value})} 
               />
               
-              <textarea className="admin-modal-input" placeholder="Deskripsi Lengkap Cafe..." required rows="3"
-                style={{ fontFamily: 'inherit', resize: 'none' }} 
+              <textarea className="admin-modal-input field-textarea" placeholder="Deskripsi Lengkap Cafe..." required rows="3"
                 value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} 
               />
               

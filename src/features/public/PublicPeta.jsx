@@ -8,7 +8,7 @@ export default function PublicPeta({ isDarkMode, setIsDarkMode, onNavigate }) {
           <div className="header-top">
             <div className="header-brand">
               <h1 className="title">Peta Lokasi Cafe 🗺️</h1>
-              <span className="location">Lihat persebaran cafe hits Ciomas</span>
+              <span className="location">Lihat persebaran cafe hits Bogor</span>
             </div>
             <div className="header-actions">
               <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
@@ -27,29 +27,16 @@ export default function PublicPeta({ isDarkMode, setIsDarkMode, onNavigate }) {
       {/* AREA GOOGLE MAPS */}
       <main className="map-container">
         <iframe 
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15852.923893815043!2d106.7441584!3d-6.6182143!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c5950d890d7b%3A0x401576d14ebd120!2sCiomas%2C%20Bogor%20Regency%2C%20West%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid" 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15852.923893815043!2d106.7441584!3d-6.6182143!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c5950d890d7b%3A0x401576d14ebd120!2sBogor%2C%20Bogor%20Regency%2C%20West%20Java!5e0!3m2!1sen!2sid!4v1700000000000!5m2!1sen!2sid" 
           width="100%" 
           height="100%" 
           style={{ border: 0 }} 
           allowFullScreen="" 
           loading="lazy" 
           referrerPolicy="no-referrer-when-downgrade"
-          title="Peta Ciomas"
+          title="Peta Bogor"
         ></iframe>
       </main>
-
-      {/* BOTTOM BAR KHUSUS PUBLIC (Tanpa Simpan & Profil) */}
-      <nav className="bottom-bar">
-        <div className="nav-item" onClick={() => onNavigate('beranda')}>
-          <span className="nav-icon">🏠</span><span>Beranda</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('peta')} style={{ color: 'var(--text-main)' }}>
-          <span className="nav-icon">🗺️</span><span>Peta</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('auth')}>
-          <span className="nav-icon">🔑</span><span>Masuk</span>
-        </div>
-      </nav>
     </div>
   );
 }

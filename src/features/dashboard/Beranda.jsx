@@ -81,22 +81,6 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
           </div>
         )}
       </main>
-
-      {/* BOTTOM BAR VIP: Tampilkan semua menu tanpa syarat */}
-      <nav className="bottom-bar">
-        <div className="nav-item" onClick={() => onNavigate('beranda')} style={{ color: 'var(--text-main)' }}>
-          <span className="nav-icon">🏠</span><span>Beranda</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('peta')}>
-          <span className="nav-icon">🗺️</span><span>Peta</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('simpan')}>
-          <span className="nav-icon">🔖</span><span>Simpan</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('profil')}>
-          <span className="nav-icon">👤</span><span>Profil</span>
-        </div>
-      </nav>
     </div>
   );
 }

@@ -14,7 +14,7 @@ import DetailCafe from './DetailCafe';
 import Toast from './component/Toast';
 import Admin from './features/dashboard/Admin';
 
-// 👇 Import Firebase Auth, Firestore
+// Import Firebase Auth, Firestore
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, deleteDoc, collection } from 'firebase/firestore'; 
 import { auth, db } from './config/firebase'; 
@@ -30,11 +30,12 @@ const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
           <span className="sidebar-icon">🏠</span><span>Beranda</span>
         </div>
 
+        <div className={`sidebar-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => onNavigate('peta')}>
+          <span className="sidebar-icon">🗺️</span><span>Peta Lokasi</span>
+        </div>
+
         {isLoggedIn && (
           <>
-            <div className={`sidebar-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => onNavigate('peta')}>
-              <span className="sidebar-icon">🗺️</span><span>Peta Lokasi</span>
-            </div>
             <div className={`sidebar-item ${currentPage === 'simpan' ? 'active' : ''}`} onClick={() => onNavigate('simpan')}>
               <span className="sidebar-icon">🔖</span><span>Disimpan</span>
             </div>
@@ -70,8 +71,8 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState(null); 
   const [reviewCount, setReviewCount] = useState(0);
 
-  // 🚀 STATE BARU: Penampung data cafe asli dari Firebase
   const [cafes, setCafes] = useState([]);
+  const [userRole, setUserRole] = useState('user'); 
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
@@ -88,13 +89,14 @@ export default function App() {
         setCurrentUser(null);
         setSavedCafes([]); 
         setReviewCount(0); 
+        setUserRole('user'); 
       }
       setIsAuthReady(true); 
     });
     return () => unsubscribe();
   }, []);
 
-  // 2. MANTRA FIRESTORE USER DATA (Bookmarks & Profil)
+  // 2. MANTRA FIRESTORE USER DATA
   useEffect(() => {
     if (!currentUser) return; 
 
@@ -109,9 +111,12 @@ export default function App() {
     const userDocRef = doc(db, 'users', currentUser.uid);
     const unsubscribeUserDoc = onSnapshot(userDocRef, (snapshot) => {
       if (snapshot.exists()) {
-        setReviewCount(snapshot.data().reviewCount || 0); 
+        const data = snapshot.data();
+        setReviewCount(data.reviewCount || 0); 
+        setUserRole(data.role || 'user'); 
       } else {
         setReviewCount(0);
+        setUserRole('user');
       }
     }, (error) => {
       console.error("Gagal memuat data profil user:", error);
@@ -123,12 +128,12 @@ export default function App() {
     };
   }, [currentUser]);
 
-  // 🚀 3. MANTRA BARU: Dengerin koleksi 'cafes' di Firebase secara Real-time!
+  // 3. MANTRA FIRESTORE CAFES DATA
   useEffect(() => {
     const cafesCollectionRef = collection(db, 'cafes');
     const unsubscribeCafes = onSnapshot(cafesCollectionRef, (snapshot) => {
       const dataDariFirebase = snapshot.docs.map(doc => ({
-        ...doc.data() // Mengambil data id, name, image, shortInfo, dll
+        ...doc.data() 
       }));
       setCafes(dataDariFirebase);
     }, (error) => {
@@ -194,7 +199,6 @@ export default function App() {
     }
   };
 
-  // Mencari cafe aktif berdasarkan data dari Firebase
   const activeCafe = cafes.find(cafe => cafe.id === selectedCafeId);
 
   if (!isAuthReady) {
@@ -211,6 +215,7 @@ export default function App() {
 
       <div className="main-layout">
         
+        {/* 🚀 SIDEBAR DESKTOP UTAMA (Akan disembunyikan otomatis di HP lewat CSS) */}
         {currentPage !== 'admin' && (
           <Sidebar currentPage={currentPage} onNavigate={navigateTo} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
         )}
@@ -221,7 +226,7 @@ export default function App() {
               <Beranda 
                 isDarkMode={isDarkMode} 
                 setIsDarkMode={setIsDarkMode} 
-                cafeData={cafes} // 🚀 Sekarang pake data asli Firebase
+                cafeData={cafes} 
                 savedCafes={savedCafes}
                 onCafeClick={handleNavigateToDetail}
                 onToggleSave={handleToggleSave}
@@ -232,7 +237,7 @@ export default function App() {
               <LandingPage 
                 isDarkMode={isDarkMode} 
                 setIsDarkMode={setIsDarkMode} 
-                cafeData={cafes} // 🚀 Sekarang pake data asli Firebase
+                cafeData={cafes} 
                 onNavigate={navigateTo}
                 showToast={showToast} 
               />
@@ -247,7 +252,7 @@ export default function App() {
             <Simpan 
               isDarkMode={isDarkMode} 
               setIsDarkMode={setIsDarkMode} 
-              cafeData={cafes} // 🚀 Sekarang pake data asli Firebase
+              cafeData={cafes} 
               savedCafes={savedCafes}
               onCafeClick={handleNavigateToDetail}
               onToggleSave={handleToggleSave}
@@ -272,6 +277,7 @@ export default function App() {
               savedCount={savedCafes.length}
               reviewCount={reviewCount} 
               onLogout={handleLogout}
+              userRole={userRole} 
             />
           )}
 
@@ -285,11 +291,45 @@ export default function App() {
               setIsDarkMode={setIsDarkMode} 
               onNavigate={navigateTo} 
               currentUser={currentUser}
-              cafeData={cafes} // 🚀 Sekarang pake data asli Firebase
+              cafeData={cafes} 
             />
           )}
         </div>
       </div>
+
+      {/* 🚀 BOTTOM BAR PINTAR (Bisa bedain tampilan user login vs publik!) */}
+      {currentPage !== 'auth' && currentPage !== 'admin' && (
+        <nav className="bottom-bar">
+          <div className={`nav-item ${currentPage === 'beranda' ? 'active' : ''}`} onClick={() => navigateTo('beranda')}>
+            <span className="nav-icon">🏠</span><span className="nav-text">Beranda</span>
+          </div>
+          
+          <div className={`nav-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => navigateTo('peta')}>
+            <span className="nav-icon">🗺️</span><span className="nav-text">Peta</span>
+          </div>
+
+          {/* 👇 LOGIKA PINTAR: Cek apakah user sudah login atau belum */}
+          {isLoggedIn ? (
+            <>
+              {/* Kalau SUDAH login, tampilkan Simpan dan Profil */}
+              <div className={`nav-item ${currentPage === 'simpan' ? 'active' : ''}`} onClick={() => navigateTo('simpan')}>
+                <span className="nav-icon">🔖</span><span className="nav-text">Simpan</span>
+              </div>
+              <div className={`nav-item ${currentPage === 'profil' ? 'active' : ''}`} onClick={() => navigateTo('profil')}>
+                <span className="nav-icon">👤</span><span className="nav-text">Profil</span>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Kalau BELUM login (Publik), tampilkan tombol Masuk */}
+              <div className="nav-item" onClick={() => navigateTo('auth')}>
+                <span className="nav-icon">🔑</span><span className="nav-text">Masuk</span>
+              </div>
+            </>
+          )}
+        </nav>
+      )}
+
     </div>
   );
 }

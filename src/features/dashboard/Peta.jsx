@@ -46,23 +46,6 @@ export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUse
           title="Google Maps"
         ></iframe>
       </main>
-
-      {/* 🧭 BOTTOM BAR MENU */}
-      <nav className="bottom-bar">
-        <div className="nav-item" onClick={() => onNavigate('beranda')}>
-          <span className="nav-icon">🏠</span><span>Beranda</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('peta')} style={{ color: 'var(--text-main)' }}>
-          <span className="nav-icon">🗺️</span><span>Peta</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('simpan')}>
-          <span className="nav-icon">🔖</span><span>Simpan</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('profil')}>
-          <span className="nav-icon">👤</span><span>Profil</span>
-        </div>
-      </nav>
-
     </div>
   );
 }

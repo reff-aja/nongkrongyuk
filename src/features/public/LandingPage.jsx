@@ -42,7 +42,6 @@ export default function LandingPage({ isDarkMode, setIsDarkMode, cafeData, onNav
           <div className="header-top">
             <div className="header-brand">
               <h1 className="title">Mau nongkrong di mana hari ini?</h1>
-              <span className="location">📍 Ciomas, Bogor</span>
             </div>
             <div className="header-actions">
               <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
@@ -79,18 +78,6 @@ export default function LandingPage({ isDarkMode, setIsDarkMode, cafeData, onNav
           </div>
         )}
       </main>
-
-      {/* BOTTOM BAR MOBILE KHUSUS PENGUNJUNG UMUM */}
-      <nav className="bottom-bar">
-        <div className="nav-item" onClick={() => onNavigate('beranda')} style={{ color: 'var(--text-main)' }}>
-          <span className="nav-icon">🏠</span>
-          <span>Beranda</span>
-        </div>
-        <div className="nav-item" onClick={() => onNavigate('auth')}>
-          <span className="nav-icon">🔑</span>
-          <span>Masuk</span>
-        </div>
-      </nav>
     </div>
   );
 }
