@@ -1649,3 +1649,109 @@ header {
     font-size: 22px !important;
   }
 }
+
+/* ==========================================================================
+   🚀 KENDALI RESPONSIF GLOBAL (SIDEBAR, HEADER MOBILE, & BOTTOM BAR)
+   ========================================================================== */
+
+/* 🖥️ 1. DEFAULT DESKTOP (LAYAR LEBAR > 768px) */
+@media screen and (min-width: 769px) {
+  /* Munculkan Sidebar Kiri */
+  .sidebar-desktop {
+    display: flex !important;
+  }
+  
+  /* Sembunyikan Header Mobile di Laptop ❌ */
+  .mobile-top-header {
+    display: none !important;
+  }
+  
+  /* Sembunyikan Bottom Bar di Laptop ❌ */
+  .bottom-bar {
+    display: none !important;
+  }
+  
+  /* Kembalikan padding halaman profil normal tanpa bantalan bawah */
+  .profile-page {
+    padding-bottom: 20px !important;
+  }
+}
+
+/* 📱 2. KONDISI LAYAR KECIL (HP / MOBILE < 768px) */
+@media screen and (max-width: 768px) {
+  
+  /* Sembunyikan Sidebar Desktop di HP ❌ */
+  .sidebar-desktop {
+    display: none !important;
+  }
+
+  /* 🚀 Munculkan Header Mobile di Atas */
+  .mobile-top-header {
+    display: flex !important;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    background-color: var(--bg-main);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    position: sticky; /* Nempel terus di atas walau di-scroll */
+    top: 0;
+    z-index: 1000;
+  }
+
+  .mobile-logo {
+    width: 35px; /* Mungil dan estetik */
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .mobile-top-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: var(--text-main);
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  /* 🚀 Munculkan Bottom Bar Pintar di Bawah */
+  .bottom-bar {
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background-color: var(--bg-main) !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
+    padding: 10px 0 !important;
+    z-index: 1000 !important;
+  }
+
+  .bottom-bar .nav-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    flex: 1 !important;
+    text-align: center !important;
+    opacity: 0.6;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+
+  /* Efek nyala kalau halamannya lagi dibuka */
+  .bottom-bar .nav-item.active {
+    opacity: 1 !important;
+    color: #0084ff !important;
+  }
+
+  .bottom-bar .nav-text {
+    font-size: 12px !important;
+    margin-top: 4px !important;
+    font-weight: 500;
+  }
+  
+  .bottom-bar .nav-icon {
+    font-size: 22px !important;
+  }
+}

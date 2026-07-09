@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import 'leaflet/dist/leaflet.css';
 
-// Import Komponen & Data
+// ==========================================
+// 📦 IMPORT KOMPONEN & DATA
+// ==========================================
 import LandingPage from './features/public/LandingPage';
 import PublicPeta from './features/public/PublicPeta';
 import Beranda from './features/dashboard/Beranda';
@@ -14,28 +16,33 @@ import DetailCafe from './DetailCafe';
 import Toast from './component/Toast';
 import Admin from './features/dashboard/Admin';
 
-// Import Firebase Auth, Firestore
+// ==========================================
+// 🔥 IMPORT FIREBASE
+// ==========================================
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, deleteDoc, collection } from 'firebase/firestore'; 
 import { auth, db } from './config/firebase'; 
 
+// ==========================================
+// 📋 KOMPONEN SIDEBAR (DESKTOP)
+// ==========================================
 const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
   return (
     <aside className="sidebar-desktop">
       <div className="sidebar-brand">
         <h2>Nongkrongyuk</h2>
       </div>
+      
       <nav className="sidebar-menu">
         <div className={`sidebar-item ${currentPage === 'beranda' ? 'active' : ''}`} onClick={() => onNavigate('beranda')}>
           <span className="sidebar-icon">🏠</span><span>Beranda</span>
         </div>
 
-        <div className={`sidebar-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => onNavigate('peta')}>
-          <span className="sidebar-icon">🗺️</span><span>Peta Lokasi</span>
-        </div>
-
-        {isLoggedIn && (
+        {isLoggedIn ? (
           <>
+            <div className={`sidebar-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => onNavigate('peta')}>
+              <span className="sidebar-icon">🗺️</span><span>Peta Lokasi</span>
+            </div>
             <div className={`sidebar-item ${currentPage === 'simpan' ? 'active' : ''}`} onClick={() => onNavigate('simpan')}>
               <span className="sidebar-icon">🔖</span><span>Disimpan</span>
             </div>
@@ -46,39 +53,75 @@ const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
               <span className="sidebar-icon">🚪</span><span>Keluar Akun</span>
             </div>
           </>
-        )}
-
-        {!isLoggedIn && (
+        ) : (
           <div className="sidebar-item login-btn-sidebar" onClick={() => onNavigate('auth')} style={{ marginTop: 'auto' }}>
             <span className="sidebar-icon">🔑</span><span>Masuk / Daftar</span>
           </div>
         )}
       </nav>
+
+      {/* 🚀 LOGO DI BAWAH SIDEBAR */}
+      <div className="sidebar-logo-container" style={{
+        marginTop: '30px',
+        padding: '15px 0',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+        width: '100%',
+        boxSizing: 'border-box'
+      }}>
+        <img 
+          src="/logo.png" 
+          alt="Logo Nongkrongyuk" 
+          style={{
+            width: '85%',
+            height: 'auto',
+            maxWidth: '180px',
+            borderRadius: '12px',
+            opacity: '0.9',
+            transition: 'transform 0.3s ease, opacity 0.3s ease',
+            cursor: 'pointer'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.opacity = '1'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.opacity = '0.9'; }}
+          onClick={() => onNavigate('beranda')}
+        />
+      </div>
     </aside>
   );
 };
 
+// ==========================================
+// 🚀 KOMPONEN UTAMA (APP)
+// ==========================================
 export default function App() {
+  // 1. UI & Navigation State
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentPage, setCurrentPage] = useState('beranda'); 
   const [selectedCafeId, setSelectedCafeId] = useState(null);
-  const [savedCafes, setSavedCafes] = useState([]); 
+  
+  // 2. Toast State
   const [toastMessage, setToastMessage] = useState(null);
   const [isToastHiding, setIsToastHiding] = useState(false);
   
+  // 3. Auth & User State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false); 
   const [currentUser, setCurrentUser] = useState(null); 
-  const [reviewCount, setReviewCount] = useState(0);
-
-  const [cafes, setCafes] = useState([]);
   const [userRole, setUserRole] = useState('user'); 
+  const [reviewCount, setReviewCount] = useState(0);
+  
+  // 4. Data State
+  const [cafes, setCafes] = useState([]);
+  const [savedCafes, setSavedCafes] = useState([]); 
 
+  // --- EFEK TEMA ---
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  // 1. MANTRA FIREBASE AUTH
+  // --- EFEK 1: FIREBASE AUTH ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -96,10 +139,11 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 2. MANTRA FIRESTORE USER DATA
+  // --- EFEK 2: FIRESTORE USER DATA (Bookmarks & Role) ---
   useEffect(() => {
     if (!currentUser) return; 
 
+    // Dengerin Data Bookmarks (Simpan)
     const bookmarksRef = collection(db, 'users', currentUser.uid, 'bookmarks');
     const unsubscribeBookmarks = onSnapshot(bookmarksRef, (snapshot) => {
       const listIds = snapshot.docs.map(doc => parseInt(doc.id)); 
@@ -108,6 +152,7 @@ export default function App() {
       console.error("Gagal memuat bookmarks:", error);
     });
 
+    // Dengerin Data Profil & Role
     const userDocRef = doc(db, 'users', currentUser.uid);
     const unsubscribeUserDoc = onSnapshot(userDocRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -128,7 +173,7 @@ export default function App() {
     };
   }, [currentUser]);
 
-  // 3. MANTRA FIRESTORE CAFES DATA
+  // --- EFEK 3: FIRESTORE CAFES DATA ---
   useEffect(() => {
     const cafesCollectionRef = collection(db, 'cafes');
     const unsubscribeCafes = onSnapshot(cafesCollectionRef, (snapshot) => {
@@ -143,6 +188,7 @@ export default function App() {
     return () => unsubscribeCafes();
   }, []);
 
+  // --- FUNGSI BANTUAN ---
   const showToast = (message) => {
     setIsToastHiding(false);
     setToastMessage(message);
@@ -201,6 +247,7 @@ export default function App() {
 
   const activeCafe = cafes.find(cafe => cafe.id === selectedCafeId);
 
+  // --- LOADING STATE ---
   if (!isAuthReady) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--bg-main)', color: 'var(--text-main)' }}>
@@ -209,18 +256,32 @@ export default function App() {
     );
   }
 
+  // --- RENDER UTAMA ---
   return (
     <div className="app-container">
       <Toast message={toastMessage} isHiding={isToastHiding} />
 
       <div className="main-layout">
         
-        {/* 🚀 SIDEBAR DESKTOP UTAMA (Akan disembunyikan otomatis di HP lewat CSS) */}
+        {/* SIDEBAR DESKTOP */}
         {currentPage !== 'admin' && (
           <Sidebar currentPage={currentPage} onNavigate={navigateTo} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
         )}
 
         <div className="page-content-wrapper">
+          
+          {/* 📱 HEADER KHUSUS MOBILE */}
+          <header className="mobile-top-header">
+            <img 
+              src="/logo.png" 
+              alt="Logo Nongkrongyuk" 
+              className="mobile-logo" 
+              onClick={() => navigateTo('beranda')}
+            />
+            <h2 onClick={() => navigateTo('beranda')}>Nongkrongyuk</h2>
+          </header>
+
+          {/* 🛣️ ROUTING HALAMAN */}
           {currentPage === 'beranda' && (
             isLoggedIn ? (
               <Beranda 
@@ -297,7 +358,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* 🚀 BOTTOM BAR PINTAR (Bisa bedain tampilan user login vs publik!) */}
+      {/* 📱 BOTTOM BAR PINTAR (Dikontrol via CSS & Kondisi Auth) */}
       {currentPage !== 'auth' && currentPage !== 'admin' && (
         <nav className="bottom-bar">
           <div className={`nav-item ${currentPage === 'beranda' ? 'active' : ''}`} onClick={() => navigateTo('beranda')}>
@@ -308,10 +369,8 @@ export default function App() {
             <span className="nav-icon">🗺️</span><span className="nav-text">Peta</span>
           </div>
 
-          {/* 👇 LOGIKA PINTAR: Cek apakah user sudah login atau belum */}
           {isLoggedIn ? (
             <>
-              {/* Kalau SUDAH login, tampilkan Simpan dan Profil */}
               <div className={`nav-item ${currentPage === 'simpan' ? 'active' : ''}`} onClick={() => navigateTo('simpan')}>
                 <span className="nav-icon">🔖</span><span className="nav-text">Simpan</span>
               </div>
@@ -320,12 +379,9 @@ export default function App() {
               </div>
             </>
           ) : (
-            <>
-              {/* Kalau BELUM login (Publik), tampilkan tombol Masuk */}
-              <div className="nav-item" onClick={() => navigateTo('auth')}>
-                <span className="nav-icon">🔑</span><span className="nav-text">Masuk</span>
-              </div>
-            </>
+            <div className="nav-item" onClick={() => navigateTo('auth')}>
+              <span className="nav-icon">🔑</span><span className="nav-text">Masuk</span>
+            </div>
           )}
         </nav>
       )}
