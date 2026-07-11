@@ -3,8 +3,11 @@ import './App.css';
 import 'leaflet/dist/leaflet.css';
 
 // ==========================================
-// 📦 IMPORT KOMPONEN & DATA
+// 🚀 IMPORT IKON SOLID DARI REACT-ICONS
 // ==========================================
+import { FaHome, FaMapMarkedAlt, FaBookmark, FaUser, FaSignOutAlt, FaKey } from 'react-icons/fa';
+
+// Import Komponen & Data
 import LandingPage from './features/public/LandingPage';
 import PublicPeta from './features/public/PublicPeta';
 import Beranda from './features/dashboard/Beranda';
@@ -16,9 +19,7 @@ import DetailCafe from './DetailCafe';
 import Toast from './component/Toast';
 import Admin from './features/dashboard/Admin';
 
-// ==========================================
-// 🔥 IMPORT FIREBASE
-// ==========================================
+// Import Firebase Auth, Firestore
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, deleteDoc, collection } from 'firebase/firestore'; 
 import { auth, db } from './config/firebase'; 
@@ -35,32 +36,32 @@ const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
       
       <nav className="sidebar-menu">
         <div className={`sidebar-item ${currentPage === 'beranda' ? 'active' : ''}`} onClick={() => onNavigate('beranda')}>
-          <span className="sidebar-icon">🏠</span><span>Beranda</span>
+          <FaHome className="sidebar-icon" /><span>Beranda</span>
         </div>
 
         {isLoggedIn ? (
           <>
             <div className={`sidebar-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => onNavigate('peta')}>
-              <span className="sidebar-icon">🗺️</span><span>Peta Lokasi</span>
+              <FaMapMarkedAlt className="sidebar-icon" /><span>Peta Lokasi</span>
             </div>
             <div className={`sidebar-item ${currentPage === 'simpan' ? 'active' : ''}`} onClick={() => onNavigate('simpan')}>
-              <span className="sidebar-icon">🔖</span><span>Disimpan</span>
+              <FaBookmark className="sidebar-icon" /><span>Disimpan</span>
             </div>
             <div className={`sidebar-item ${currentPage === 'profil' ? 'active' : ''}`} onClick={() => onNavigate('profil')}>
-              <span className="sidebar-icon">👤</span><span>Profil Saya</span>
+              <FaUser className="sidebar-icon" /><span>Profil Saya</span>
             </div>
             <div className="sidebar-item logout-item-sidebar" onClick={onLogout} style={{ marginTop: 'auto', color: '#FF5252' }}>
-              <span className="sidebar-icon">🚪</span><span>Keluar Akun</span>
+              <FaSignOutAlt className="sidebar-icon" /><span>Keluar Akun</span>
             </div>
           </>
         ) : (
           <div className="sidebar-item login-btn-sidebar" onClick={() => onNavigate('auth')} style={{ marginTop: 'auto' }}>
-            <span className="sidebar-icon">🔑</span><span>Masuk / Daftar</span>
+            <FaKey className="sidebar-icon" /><span>Masuk / Daftar</span>
           </div>
         )}
       </nav>
 
-      {/* 🚀 LOGO DI BAWAH SIDEBAR */}
+      {/* Logo di Bawah Sidebar */}
       <div className="sidebar-logo-container" style={{
         marginTop: '30px',
         padding: '15px 0',
@@ -72,7 +73,7 @@ const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
         boxSizing: 'border-box'
       }}>
         <img 
-          src="/logo.png" 
+          src="/logo-no-bg.png" 
           alt="Logo Nongkrongyuk" 
           style={{
             width: '85%',
@@ -96,32 +97,26 @@ const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
 // 🚀 KOMPONEN UTAMA (APP)
 // ==========================================
 export default function App() {
-  // 1. UI & Navigation State
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [currentPage, setCurrentPage] = useState('beranda'); 
   const [selectedCafeId, setSelectedCafeId] = useState(null);
   
-  // 2. Toast State
   const [toastMessage, setToastMessage] = useState(null);
   const [isToastHiding, setIsToastHiding] = useState(false);
   
-  // 3. Auth & User State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false); 
   const [currentUser, setCurrentUser] = useState(null); 
   const [userRole, setUserRole] = useState('user'); 
   const [reviewCount, setReviewCount] = useState(0);
   
-  // 4. Data State
   const [cafes, setCafes] = useState([]);
   const [savedCafes, setSavedCafes] = useState([]); 
 
-  // --- EFEK TEMA ---
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
-  // --- EFEK 1: FIREBASE AUTH ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -139,11 +134,9 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // --- EFEK 2: FIRESTORE USER DATA (Bookmarks & Role) ---
   useEffect(() => {
     if (!currentUser) return; 
 
-    // Dengerin Data Bookmarks (Simpan)
     const bookmarksRef = collection(db, 'users', currentUser.uid, 'bookmarks');
     const unsubscribeBookmarks = onSnapshot(bookmarksRef, (snapshot) => {
       const listIds = snapshot.docs.map(doc => parseInt(doc.id)); 
@@ -152,7 +145,6 @@ export default function App() {
       console.error("Gagal memuat bookmarks:", error);
     });
 
-    // Dengerin Data Profil & Role
     const userDocRef = doc(db, 'users', currentUser.uid);
     const unsubscribeUserDoc = onSnapshot(userDocRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -173,7 +165,6 @@ export default function App() {
     };
   }, [currentUser]);
 
-  // --- EFEK 3: FIRESTORE CAFES DATA ---
   useEffect(() => {
     const cafesCollectionRef = collection(db, 'cafes');
     const unsubscribeCafes = onSnapshot(cafesCollectionRef, (snapshot) => {
@@ -188,7 +179,6 @@ export default function App() {
     return () => unsubscribeCafes();
   }, []);
 
-  // --- FUNGSI BANTUAN ---
   const showToast = (message) => {
     setIsToastHiding(false);
     setToastMessage(message);
@@ -247,7 +237,6 @@ export default function App() {
 
   const activeCafe = cafes.find(cafe => cafe.id === selectedCafeId);
 
-  // --- LOADING STATE ---
   if (!isAuthReady) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--bg-main)', color: 'var(--text-main)' }}>
@@ -256,7 +245,6 @@ export default function App() {
     );
   }
 
-  // --- RENDER UTAMA ---
   return (
     <div className="app-container">
       <Toast message={toastMessage} isHiding={isToastHiding} />
@@ -270,7 +258,7 @@ export default function App() {
 
         <div className="page-content-wrapper">
           
-          {/* 📱 HEADER KHUSUS MOBILE */}
+          {/* HEADER KHUSUS MOBILE */}
           <header className="mobile-top-header">
             <img 
               src="/logo.png" 
@@ -281,7 +269,7 @@ export default function App() {
             <h2 onClick={() => navigateTo('beranda')}>Nongkrongyuk</h2>
           </header>
 
-          {/* 🛣️ ROUTING HALAMAN */}
+          {/* ROUTING HALAMAN */}
           {currentPage === 'beranda' && (
             isLoggedIn ? (
               <Beranda 
@@ -358,29 +346,29 @@ export default function App() {
         </div>
       </div>
 
-      {/* 📱 BOTTOM BAR PINTAR (Dikontrol via CSS & Kondisi Auth) */}
+      {/* 📱 BOTTOM BAR PINTAR (Di HP) */}
       {currentPage !== 'auth' && currentPage !== 'admin' && (
         <nav className="bottom-bar">
           <div className={`nav-item ${currentPage === 'beranda' ? 'active' : ''}`} onClick={() => navigateTo('beranda')}>
-            <span className="nav-icon">🏠</span><span className="nav-text">Beranda</span>
+            <FaHome className="nav-icon" /><span className="nav-text">Beranda</span>
           </div>
           
           <div className={`nav-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => navigateTo('peta')}>
-            <span className="nav-icon">🗺️</span><span className="nav-text">Peta</span>
+            <FaMapMarkedAlt className="nav-icon" /><span className="nav-text">Peta</span>
           </div>
 
           {isLoggedIn ? (
             <>
               <div className={`nav-item ${currentPage === 'simpan' ? 'active' : ''}`} onClick={() => navigateTo('simpan')}>
-                <span className="nav-icon">🔖</span><span className="nav-text">Simpan</span>
+                <FaBookmark className="nav-icon" /><span className="nav-text">Simpan</span>
               </div>
               <div className={`nav-item ${currentPage === 'profil' ? 'active' : ''}`} onClick={() => navigateTo('profil')}>
-                <span className="nav-icon">👤</span><span className="nav-text">Profil</span>
+                <FaUser className="nav-icon" /><span className="nav-text">Profil</span>
               </div>
             </>
           ) : (
             <div className="nav-item" onClick={() => navigateTo('auth')}>
-              <span className="nav-icon">🔑</span><span className="nav-text">Masuk</span>
+              <FaKey className="nav-icon" /><span className="nav-text">Masuk</span>
             </div>
           )}
         </nav>

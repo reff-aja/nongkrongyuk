@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 // Import fungsi mutasi Firestore
 import { doc, setDoc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
+import { FaSun, FaMoon } from 'react-icons/fa';
 
 export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUser, cafeData = [] }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   // State penanda mode EDIT atau TAMBAH BARU
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingCafeId, setEditingCafeId] = useState(null);
@@ -25,8 +26,8 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
   const openAddModal = () => {
     setIsEditMode(false);
     setEditingCafeId(null);
-    setFormData({ 
-      name: '', image: '', shortInfo: '', city: '', address: '', mapsLink: '', description: '' 
+    setFormData({
+      name: '', image: '', shortInfo: '', city: '', address: '', mapsLink: '', description: ''
     });
     setIsModalOpen(true);
   };
@@ -49,7 +50,7 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
 
   // Fungsi submit form (Tambah / Edit)
   const handleSaveCafe = async (e) => {
-    e.preventDefault(); 
+    e.preventDefault();
 
     if (isEditMode && editingCafeId) {
       try {
@@ -91,7 +92,7 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
     } else {
       const cafeIdStr = Date.now().toString();
       const newCafe = {
-        id: Date.now(), 
+        id: Date.now(),
         name: formData.name,
         image: formData.image,
         shortInfo: formData.shortInfo,
@@ -99,7 +100,7 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
         address: formData.address,
         mapsLink: formData.mapsLink,
         description: formData.description,
-        reviews: [] 
+        reviews: []
       };
 
       try {
@@ -128,26 +129,26 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
   return (
     // 🚀 SEKARANG STRUKTUR MURNI PAKAI CLASSNAME CSS LUAR
     <div className="admin-panel-layout">
-      
+
       {/* 📋 SIDEBAR ADMIN */}
       <aside className="admin-sidebar">
         <h2 className="admin-sidebar-title">Admin Panel</h2>
-        
+
         <nav className="admin-sidebar-nav">
-          <button 
-            onClick={() => setActiveTab('dashboard')} 
+          <button
+            onClick={() => setActiveTab('dashboard')}
             className={`admin-nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}
           >
             📊 Dashboard
           </button>
-          <button 
-            onClick={() => setActiveTab('kelolaCafe')} 
+          <button
+            onClick={() => setActiveTab('kelolaCafe')}
             className={`admin-nav-btn ${activeTab === 'kelolaCafe' ? 'active' : ''}`}
           >
             ☕ Kelola Cafe
           </button>
-          <button 
-            onClick={() => setActiveTab('kelolaUser')} 
+          <button
+            onClick={() => setActiveTab('kelolaUser')}
             className={`admin-nav-btn ${activeTab === 'kelolaUser' ? 'active' : ''}`}
           >
             👥 Kelola User
@@ -169,8 +170,16 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
             {activeTab === 'kelolaCafe' && 'Manajemen Data Cafe'}
             {activeTab === 'kelolaUser' && 'Manajemen Pengguna'}
           </h1>
-          <button onClick={() => setIsDarkMode(!isDarkMode)} className="admin-theme-toggle">
-            {isDarkMode ? '☀️' : '🌙'}
+          <button
+            onClick={() => setIsDarkMode(!isDarkMode)}
+            className="admin-theme-toggle"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            {isDarkMode ? (
+              <FaSun style={{ color: '#ffb900', transition: '0.3s' }} />
+            ) : (
+              <FaMoon style={{ color: '#667eea', transition: '0.3s' }} />
+            )}
           </button>
         </div>
 
@@ -200,7 +209,7 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
             <button onClick={openAddModal} className="admin-btn-trigger-add">
               + Tambah Cafe Baru
             </button>
-            
+
             {/* Wrapper pembantu scrollbar otomatis di HP */}
             <div className="admin-table-responsive-wrapper">
               <table className="admin-data-table">
@@ -238,40 +247,40 @@ export default function Admin({ isDarkMode, setIsDarkMode, onNavigate, currentUs
       {/* 🚀 MODAL / POP-UP FORM TAMBAH & EDIT CAFE */}
       {isModalOpen && (
         <div className="admin-modal-overlay">
-          <div className="admin-modal-card"> 
+          <div className="admin-modal-card">
             <h2 className="admin-modal-title">
               {isEditMode ? 'Edit Data Cafe' : 'Form Cafe Baru'}
             </h2>
-            
+
             <form onSubmit={handleSaveCafe} className="admin-modal-form">
               <input className="admin-modal-input" type="text" placeholder="Nama Cafe (Misal: Kopi Kenangan)" required
-                value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
-              
+
               <input className="admin-modal-input" type="url" placeholder="Link URL Foto Cafe" required
-                value={formData.image} onChange={(e) => setFormData({...formData, image: e.target.value})} 
+                value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })}
               />
-              
+
               <input className="admin-modal-input" type="text" placeholder="Info Singkat (Misal: ⭐️ 4.5 | 💰 Rp 20k - 50k)" required
-                value={formData.shortInfo} onChange={(e) => setFormData({...formData, shortInfo: e.target.value})} 
+                value={formData.shortInfo} onChange={(e) => setFormData({ ...formData, shortInfo: e.target.value })}
               />
-              
+
               <input className="admin-modal-input" type="text" placeholder="Kota (Misal: Jakarta)" required
-                value={formData.city} onChange={(e) => setFormData({...formData, city: e.target.value})} 
+                value={formData.city} onChange={(e) => setFormData({ ...formData, city: e.target.value })}
               />
-              
+
               <input className="admin-modal-input" type="text" placeholder="Alamat Lengkap" required
-                value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} 
+                value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               />
-              
+
               <input className="admin-modal-input" type="url" placeholder="Link Google Maps" required
-                value={formData.mapsLink} onChange={(e) => setFormData({...formData, mapsLink: e.target.value})} 
+                value={formData.mapsLink} onChange={(e) => setFormData({ ...formData, mapsLink: e.target.value })}
               />
-              
+
               <textarea className="admin-modal-input field-textarea" placeholder="Deskripsi Lengkap Cafe..." required rows="3"
-                value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               />
-              
+
               <div className="admin-modal-actions">
                 <button type="submit" className="admin-btn-save">
                   {isEditMode ? 'Perbarui Data' : 'Simpan Data'}

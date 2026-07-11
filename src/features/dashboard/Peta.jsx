@@ -1,4 +1,6 @@
 import React from 'react';
+// 🚀 IMPORT IKON SOLID DARI REACT-ICONS
+import { FaSun, FaMoon } from 'react-icons/fa';
 
 export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUser }) {
   
@@ -16,11 +18,16 @@ export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUse
           </div>
           
           <div className="header-right" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            {/* 🚀 TOMBOL TEMA MENGGUNAKAN IKON FaSun / FaMoon */}
             <button 
               onClick={() => setIsDarkMode(!isDarkMode)} 
-              style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              {isDarkMode ? '☀️' : '🌙'}
+              {isDarkMode ? (
+                <FaSun style={{ color: '#ffb900' }} />
+              ) : (
+                <FaMoon style={{ color: '#667eea' }} />
+              )}
             </button>
             <img 
               src={currentUser?.photoURL || "https://placehold.co/150"} 
@@ -32,10 +39,9 @@ export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUse
         </div>
       </header>
 
-      {/* 🗺️ AREA PETA GOOGLE MAPS (PALING AMAN) */}
+      {/* 🗺️ AREA PETA GOOGLE MAPS */}
       <main className="map-container" style={{ height: 'calc(100vh - 140px)', width: '100%', position: 'relative' }}>
         <iframe 
-          // Link embed Google Maps ini akan otomatis menampilkan area Bogor
           src="https://maps.google.com/maps?q=Bogor&t=&z=13&ie=UTF8&iwloc=&output=embed" 
           width="100%" 
           height="100%" 
@@ -43,9 +49,11 @@ export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUse
           allowFullScreen="" 
           loading="lazy" 
           referrerPolicy="no-referrer-when-downgrade"
-          title="Google Maps"
+          title="Google Maps Bogor"
         ></iframe>
       </main>
+
+      {/* 🚀 BERSIH: Bottom bar lama di file ini sudah dihapus total! */}
     </div>
   );
 }

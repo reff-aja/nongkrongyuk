@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { updateProfile, updateEmail } from 'firebase/auth';
 import { auth } from '../../config/firebase';
+import { FaSun, FaMoon } from 'react-icons/fa';
 
 export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCount, reviewCount, onLogout, userRole }) {
   const currentUser = auth.currentUser;
@@ -73,7 +74,7 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
 
   return (
     <div className="profile-page anonymity animate-fade-in">
-      
+
       <header className="profile-header">
         <h2>{isEditing ? 'Edit Profil Saya' : 'Profil Saya'}</h2>
       </header>
@@ -127,12 +128,26 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
 
             <div className="profile-menu-actions">
               <button onClick={() => setIsEditing(true)} className="btn-menu-edit">✏️ Edit Profil Saya</button>
-              
+
               {userRole === 'admin' && (
                 <button onClick={() => onNavigate('admin')} className="btn-menu-admin">👨‍💻 Masuk Dashboard Admin</button>
               )}
 
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className="btn-menu-theme">Mode {isDarkMode ? '☀️ Terang' : '🌙 Gelap'}</button>
+              <button
+                onClick={() => setIsDarkMode(!isDarkMode)}
+                className="btn-menu-theme"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+              >
+                {isDarkMode ? (
+                  <>
+                    <FaSun style={{ color: '#ffb900' }} /> <span>Mode Terang</span>
+                  </>
+                ) : (
+                  <>
+                    <FaMoon style={{ color: '#888' }} /> <span>Mode Gelap</span>
+                  </>
+                )}
+              </button>
               <button onClick={onLogout} className="btn-menu-logout">Keluar Akun 🚪</button>
             </div>
           </>

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+// 🚀 IMPORT IKON SOLID DARI REACT-ICONS
+import { FaHeart, FaSun, FaMoon } from 'react-icons/fa';
 
 const CafeCard = ({ cafe, onClick, isSaved, onToggleSave }) => {
   return (
@@ -8,8 +10,9 @@ const CafeCard = ({ cafe, onClick, isSaved, onToggleSave }) => {
         <button 
           className="btn-love" 
           onClick={(e) => onToggleSave(cafe.id, e)}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
         >
-          {isSaved ? '❤️' : '🤍'}
+          <FaHeart style={{ color: isSaved ? '#FF5252' : '#ccc', transition: '0.3s', fontSize: '18px' }} />
         </button>
       </div>
       <div className="card-content">
@@ -22,8 +25,7 @@ const CafeCard = ({ cafe, onClick, isSaved, onToggleSave }) => {
   );
 };
 
-// Tidak perlu lagi menerima props 'isLoggedIn'
-export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafes, onCafeClick, onToggleSave, onNavigate, currentUser, selectedCity, setSelectedCity }) {
+export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafes, onCafeClick, onToggleSave, onNavigate, currentUser }) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredCafes = cafeData.filter((cafe) => {
@@ -31,29 +33,41 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
   });
 
   return (
-    <div className="animate-fade-in">
+    <div className="animate-fade-in" style={{ paddingBottom: '30px' }}>
       <header>
         <div className="header-content">
           <div className="header-top">
             <div className="header-brand">
-              <h1 className="title">Enaknya nongkrong dimana nih?</h1>
+              <h1 className="title" onClick={() => onNavigate('beranda')} style={{ cursor: 'pointer' }}>
+                Temukan Cafe
+              </h1>
+              <span className="subtitle">Pilihan cafe terbaik untuk tempat nongkrongmu</span>
             </div>
-            <div className="header-actions">
-              <button className="theme-toggle" onClick={() => setIsDarkMode(!isDarkMode)}>
-                {isDarkMode ? '🌙' : '☀️'}
+            
+            {/* 🚀 REVISI: HEADER ACTIONS DENGAN TOMBOL TEMA PINTAR & AVATAR */}
+            <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <button 
+                onClick={() => setIsDarkMode(!isDarkMode)} 
+                style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '5px' }}
+              >
+                {isDarkMode ? (
+                  <FaSun style={{ color: '#ffb900', transition: '0.3s' }} />
+                ) : (
+                  <FaMoon style={{ color: '#667eea', transition: '0.3s' }} />
+                )}
               </button>
               
-              {/* PASTI SUDAH LOGIN: Langsung tampilkan foto profil */}
-              <button className="profile-menu" onClick={() => onNavigate('profil')}>
+              <button className="profile-menu" onClick={() => onNavigate('profil')} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}>
                 <img 
                   src={currentUser?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"} 
                   alt="Avatar" 
-                  className="avatar-header" // ganti sesuai nama class di css berandamu
-                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} // opsional biar rapi bulat berbentuk avatar
+                  className="avatar-header" 
+                  style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #0084ff' }} 
                 />
               </button>
             </div>
           </div>
+          
           <input 
             type="text" 
             className="search-bar" 
@@ -76,8 +90,8 @@ export default function Beranda({ isDarkMode, setIsDarkMode, cafeData, savedCafe
             />
           ))
         ) : (
-          <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '40px 20px', opacity: 0.8 }}>
-            <h3>Yah, cafenya belum ketemu 🥲</h3>
+          <div style={{ textAlign: 'center', gridColumn: '1 / -1', padding: '40px 20px', opacity: 0.7 }}>
+            <p>Cafe yang kamu cari tidak ditemukan... ☕</p>
           </div>
         )}
       </main>
