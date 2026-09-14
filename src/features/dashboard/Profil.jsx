@@ -1,8 +1,9 @@
 // src/features/dashboard/Profil.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { updateProfile, updateEmail } from 'firebase/auth';
-import { auth } from '../../config/firebase';
-import { FaSun, FaMoon } from 'react-icons/fa';
+import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore'; // Tambah getDoc & onSnapshot
+import { auth, db } from '../../config/firebase'; 
+import { FaSun, FaMoon, FaEdit, FaUserShield, FaSignOutAlt } from 'react-icons/fa';
 
 export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCount, reviewCount, onLogout, userRole }) {
   const currentUser = auth.currentUser;
@@ -11,10 +12,26 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
   const [fullName, setFullName] = useState(currentUser?.displayName || '');
   const [email, setEmail] = useState(currentUser?.email || '');
   const [photoFile, setPhotoFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(currentUser?.photoURL || '');
+  
+  // 🚀 BUAT STATE LOKAL KHUSUS FOTO DARI FIRESTORE
+  const [firestorePhoto, setFirestorePhoto] = useState(currentUser?.photoURL || '');
   const [loading, setLoading] = useState(false);
 
   const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
+
+  // 🚀 AMBIL DATA FOTO LANGSUNG DARI FIRESTORE SECARA REAL-TIME
+  useEffect(() => {
+    if (!currentUser) return;
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+      if (docSnap.exists() && docSnap.data().photoURL) {
+        setFirestorePhoto(docSnap.data().photoURL);
+      }
+    });
+    return () => unsubscribe();
+  }, [currentUser]);
+
+  const [previewUrl, setPreviewUrl] = useState(firestorePhoto);
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -29,8 +46,9 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
     setLoading(true);
 
     try {
-      let finalPhotoUrl = currentUser?.photoURL || '';
+      let finalPhotoUrl = firestorePhoto;
 
+      // 1. Upload ke ImgBB jika ada file baru
       if (photoFile) {
         const formData = new FormData();
         formData.append('image', photoFile);
@@ -43,12 +61,21 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
         const data = await response.json();
 
         if (data.success) {
-          finalPhotoUrl = data.data.url;
+          finalPhotoUrl = data.data.url; // Link ImgBB baru
         } else {
           throw new Error('Gagal upload gambar ke ImgBB');
         }
       }
 
+      // 2. Simpan URL ImgBB TERSEBUT KE FIRESTORE (Kunci Utama!)
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      await setDoc(userDocRef, {
+        photoURL: finalPhotoUrl,
+        displayName: fullName,
+        email: email
+      }, { merge: true });
+
+      // 3. Update Auth juga buat berjaga-jaga
       await updateProfile(currentUser, {
         displayName: fullName,
         photoURL: finalPhotoUrl
@@ -60,6 +87,8 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
 
       alert('Profil kamu berhasil diperbarui! 🎉');
       setIsEditing(false);
+      setFirestorePhoto(finalPhotoUrl);
+
     } catch (error) {
       console.error(error);
       if (error.code === 'auth/requires-recent-login') {
@@ -83,7 +112,12 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
         {isEditing ? (
           <form onSubmit={handleSaveProfile} className="profile-form">
             <div className="avatar-preview-container">
-              <img src={previewUrl || "https://placehold.co/120"} alt="Preview Avatar" className="profile-avatar" />
+              <img 
+                src={previewUrl || firestorePhoto || "https://placehold.co/120"} 
+                alt="Preview Avatar" 
+                className="profile-avatar"  
+                onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"; }}
+              />
               <div className="upload-btn-wrapper">
                 <label htmlFor="file-upload" className="btn-upload-photo">📸 Pilih Foto Baru</label>
                 <input id="file-upload" type="file" accept="image/*" onChange={handlePhotoChange} disabled={loading} />
@@ -104,14 +138,20 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
               <button type="submit" className="btn-save-profile" disabled={loading}>
                 {loading ? 'Menyimpan... ⏳' : 'Simpan Perubahan ✅'}
               </button>
-              <button type="button" onClick={() => { setIsEditing(false); setPreviewUrl(currentUser?.photoURL || ''); }} className="btn-cancel-profile" disabled={loading}>
+              <button type="button" onClick={() => { setIsEditing(false); setPreviewUrl(firestorePhoto); }} className="btn-cancel-profile" disabled={loading}>
                 Batal
               </button>
             </div>
           </form>
         ) : (
           <>
-            <img src={currentUser?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"} alt="Avatar" className="profile-avatar" />
+            {/* 🚀 GUNAKAN `firestorePhoto` AGAR SELALU AMBIL DARI DATABASE */}
+            <img 
+              src={firestorePhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"} 
+              alt="Avatar" 
+              className="profile-avatar" 
+              onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"; }}
+            />
             <h2 className="user-display-name">{currentUser?.displayName || 'User Kece'}</h2>
             <p className="user-email">{currentUser?.email}</p>
 
@@ -127,10 +167,22 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
             </div>
 
             <div className="profile-menu-actions">
-              <button onClick={() => setIsEditing(true)} className="btn-menu-edit">✏️ Edit Profil Saya</button>
+              <button 
+                onClick={() => { setIsEditing(true); setPreviewUrl(firestorePhoto); }} 
+                className="btn-menu-edit"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                <FaEdit /> Edit Profil Saya
+              </button>
 
               {userRole === 'admin' && (
-                <button onClick={() => onNavigate('admin')} className="btn-menu-admin">👨‍💻 Masuk Dashboard Admin</button>
+                <button 
+                  onClick={() => onNavigate('admin')} 
+                  className="btn-menu-admin"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                >
+                  <FaUserShield /> Masuk Dashboard Admin
+                </button>
               )}
 
               <button
@@ -148,13 +200,18 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
                   </>
                 )}
               </button>
-              <button onClick={onLogout} className="btn-menu-logout">Keluar Akun 🚪</button>
+              
+              <button 
+                onClick={onLogout} 
+                className="btn-menu-logout"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                <FaSignOutAlt /> Keluar Akun
+              </button>
             </div>
           </>
         )}
       </main>
-
-      {/* 🚀 BERSIH TOTAL: Navigasi bawah dipindah ke App.jsx pusat */}
 
     </div>
   );

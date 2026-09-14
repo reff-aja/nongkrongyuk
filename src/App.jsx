@@ -134,6 +134,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
+  // 2. MANTRA FIRESTORE USER DATA (Bookmarks, Profil, Role, & Sinkronisasi Foto Real-time)
   useEffect(() => {
     if (!currentUser) return; 
 
@@ -151,6 +152,13 @@ export default function App() {
         const data = snapshot.data();
         setReviewCount(data.reviewCount || 0); 
         setUserRole(data.role || 'user'); 
+
+        // 🚀 JURUS SAKTI: Sinkronisasi foto profil real-time ke session aktif!
+        if (data.photoURL && data.photoURL !== currentUser.photoURL) {
+          currentUser.photoURL = data.photoURL;
+          setCurrentUser({ ...currentUser }); // Paksa React render ulang state user
+        }
+
       } else {
         setReviewCount(0);
         setUserRole('user');
@@ -312,9 +320,9 @@ export default function App() {
 
           {currentPage === 'peta' && (
             isLoggedIn ? (
-              <Peta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} currentUser={currentUser} />
+              <Peta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} currentUser={currentUser} cafeData={cafes} onCafeClick={handleNavigateToDetail} />
             ) : (
-              <PublicPeta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} />
+              <PublicPeta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} cafeData={cafes} />
             )
           )}
 

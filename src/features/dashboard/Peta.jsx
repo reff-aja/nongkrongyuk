@@ -1,8 +1,9 @@
 import React from 'react';
 // 🚀 IMPORT IKON SOLID DARI REACT-ICONS
 import { FaSun, FaMoon } from 'react-icons/fa';
+import CafeMap from '../../component/CafeMap';
 
-export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUser }) {
+export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUser, cafeData, onCafeClick }) {
   
   return (
     <div className="map-page anonymity animate-fade-in">
@@ -40,17 +41,8 @@ export default function Peta({ isDarkMode, setIsDarkMode, onNavigate, currentUse
       </header>
 
       {/* 🗺️ AREA PETA GOOGLE MAPS */}
-      <main className="map-container" style={{ height: 'calc(100vh - 140px)', width: '100%', position: 'relative' }}>
-        <iframe 
-          src="https://maps.google.com/maps?q=Bogor&t=&z=13&ie=UTF8&iwloc=&output=embed" 
-          width="100%" 
-          height="100%" 
-          style={{ border: 0 }} 
-          allowFullScreen="" 
-          loading="lazy" 
-          referrerPolicy="no-referrer-when-downgrade"
-          title="Google Maps Bogor"
-        ></iframe>
+      <main className="map-container">
+        <CafeMap cafeData={cafeData} onCafeClick={onCafeClick} />
       </main>
 
       {/* 🚀 BERSIH: Bottom bar lama di file ini sudah dihapus total! */}
