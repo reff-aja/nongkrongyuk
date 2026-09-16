@@ -16,7 +16,7 @@ import Simpan from './features/dashboard/Simpan';
 import Profil from './features/dashboard/Profil';
 import Auth from './features/auth/Auth';
 import DetailCafe from './DetailCafe';
-import Toast from './component/Toast';
+import Toast from './component/toast';
 import Admin from './features/dashboard/Admin';
 
 // Import Firebase Auth, Firestore
