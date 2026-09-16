@@ -106,7 +106,11 @@ export default function App() {
   
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false); 
-  const [currentUser, setCurrentUser] = useState(null); 
+  
+  // 🚀 STATE PENTING: Pisahkan akun asli (Auth) dengan data tampilan (UI Profile)
+  const [currentUser, setCurrentUser] = useState(null); // Untuk keperluan logika ke server
+  const [userProfile, setUserProfile] = useState(null); // KHUSUS UNTUK TAMPILAN FOTO & NAMA DI WEB
+  
   const [userRole, setUserRole] = useState('user'); 
   const [reviewCount, setReviewCount] = useState(0);
   
@@ -117,14 +121,23 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
 
+  // 1. MANTRA LOGIN
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setIsLoggedIn(true);
         setCurrentUser(user);
+        // Buat salinan data awal untuk tampilan
+        setUserProfile({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL
+        });
       } else {
         setIsLoggedIn(false);
         setCurrentUser(null);
+        setUserProfile(null);
         setSavedCafes([]); 
         setReviewCount(0); 
         setUserRole('user'); 
@@ -134,10 +147,11 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 2. MANTRA FIRESTORE USER DATA (Bookmarks, Profil, Role, & Sinkronisasi Foto Real-time)
+  // 2. MANTRA FIRESTORE SEBAGAI SUMBER KEBENARAN UTAMA (Single Source of Truth)
   useEffect(() => {
     if (!currentUser) return; 
 
+    // Tarik data bookmark
     const bookmarksRef = collection(db, 'users', currentUser.uid, 'bookmarks');
     const unsubscribeBookmarks = onSnapshot(bookmarksRef, (snapshot) => {
       const listIds = snapshot.docs.map(doc => parseInt(doc.id)); 
@@ -146,19 +160,21 @@ export default function App() {
       console.error("Gagal memuat bookmarks:", error);
     });
 
+    // Tarik data profil langsung dari Firestore secara Real-Time!
     const userDocRef = doc(db, 'users', currentUser.uid);
     const unsubscribeUserDoc = onSnapshot(userDocRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
+        
+        // 🚀 TIMPA DATA TAMPILAN DENGAN DATA DARI FIRESTORE
+        setUserProfile(prev => ({
+          ...prev,
+          displayName: data.displayName || prev?.displayName,
+          photoURL: data.photoURL || prev?.photoURL // FOTO IMGBB MASUK SINI!
+        }));
+        
         setReviewCount(data.reviewCount || 0); 
         setUserRole(data.role || 'user'); 
-
-        // 🚀 JURUS SAKTI: Sinkronisasi foto profil real-time ke session aktif!
-        if (data.photoURL && data.photoURL !== currentUser.photoURL) {
-          currentUser.photoURL = data.photoURL;
-          setCurrentUser({ ...currentUser }); // Paksa React render ulang state user
-        }
-
       } else {
         setReviewCount(0);
         setUserRole('user');
@@ -173,6 +189,7 @@ export default function App() {
     };
   }, [currentUser]);
 
+  // 3. MANTRA KAFE
   useEffect(() => {
     const cafesCollectionRef = collection(db, 'cafes');
     const unsubscribeCafes = onSnapshot(cafesCollectionRef, (snapshot) => {
@@ -277,7 +294,10 @@ export default function App() {
             <h2 onClick={() => navigateTo('beranda')}>Nongkrongyuk</h2>
           </header>
 
-          {/* ROUTING HALAMAN */}
+          {/* ROUTING HALAMAN 
+              🚀 PERHATIKAN: Sekarang kita lempar `userProfile` (Data Firestore) 
+              ke semua halaman menggantikan `currentUser` (Data Auth kolot) 
+          */}
           {currentPage === 'beranda' && (
             isLoggedIn ? (
               <Beranda 
@@ -288,7 +308,7 @@ export default function App() {
                 onCafeClick={handleNavigateToDetail}
                 onToggleSave={handleToggleSave}
                 onNavigate={navigateTo}
-                currentUser={currentUser}
+                currentUser={userProfile} 
               />
             ) : (
               <LandingPage 
@@ -314,15 +334,15 @@ export default function App() {
               onCafeClick={handleNavigateToDetail}
               onToggleSave={handleToggleSave}
               onNavigate={navigateTo}
-              currentUser={currentUser}
+              currentUser={userProfile} 
             />
           )}
 
           {currentPage === 'peta' && (
             isLoggedIn ? (
-              <Peta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} currentUser={currentUser} cafeData={cafes} onCafeClick={handleNavigateToDetail} />
+              <Peta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} currentUser={userProfile} />
             ) : (
-              <PublicPeta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} cafeData={cafes} />
+              <PublicPeta isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} onNavigate={navigateTo} />
             )
           )}
 
@@ -347,7 +367,7 @@ export default function App() {
               isDarkMode={isDarkMode} 
               setIsDarkMode={setIsDarkMode} 
               onNavigate={navigateTo} 
-              currentUser={currentUser}
+              currentUser={userProfile} 
               cafeData={cafes} 
             />
           )}
