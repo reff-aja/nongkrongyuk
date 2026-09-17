@@ -1,9 +1,9 @@
 // src/features/dashboard/Profil.jsx
 import React, { useState, useEffect } from 'react';
 import { updateProfile, updateEmail } from 'firebase/auth';
-import { doc, getDoc, onSnapshot, setDoc } from 'firebase/firestore'; // Tambah getDoc & onSnapshot
+import { doc, onSnapshot, setDoc } from 'firebase/firestore'; 
 import { auth, db } from '../../config/firebase'; 
-import { FaSun, FaMoon, FaEdit, FaUserShield, FaSignOutAlt } from 'react-icons/fa';
+import { FaSun, FaMoon, FaEdit, FaUserShield, FaSignOutAlt, FaInfoCircle } from 'react-icons/fa';
 
 export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCount, reviewCount, onLogout, userRole }) {
   const currentUser = auth.currentUser;
@@ -13,13 +13,11 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
   const [email, setEmail] = useState(currentUser?.email || '');
   const [photoFile, setPhotoFile] = useState(null);
   
-  // 🚀 BUAT STATE LOKAL KHUSUS FOTO DARI FIRESTORE
   const [firestorePhoto, setFirestorePhoto] = useState(currentUser?.photoURL || '');
   const [loading, setLoading] = useState(false);
 
   const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
-  // 🚀 AMBIL DATA FOTO LANGSUNG DARI FIRESTORE SECARA REAL-TIME
   useEffect(() => {
     if (!currentUser) return;
     const userDocRef = doc(db, 'users', currentUser.uid);
@@ -48,7 +46,6 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
     try {
       let finalPhotoUrl = firestorePhoto;
 
-      // 1. Upload ke ImgBB jika ada file baru
       if (photoFile) {
         const formData = new FormData();
         formData.append('image', photoFile);
@@ -61,13 +58,12 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
         const data = await response.json();
 
         if (data.success) {
-          finalPhotoUrl = data.data.url; // Link ImgBB baru
+          finalPhotoUrl = data.data.url;
         } else {
           throw new Error('Gagal upload gambar ke ImgBB');
         }
       }
 
-      // 2. Simpan URL ImgBB TERSEBUT KE FIRESTORE (Kunci Utama!)
       const userDocRef = doc(db, 'users', currentUser.uid);
       await setDoc(userDocRef, {
         photoURL: finalPhotoUrl,
@@ -75,7 +71,6 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
         email: email
       }, { merge: true });
 
-      // 3. Update Auth juga buat berjaga-jaga
       await updateProfile(currentUser, {
         displayName: fullName,
         photoURL: finalPhotoUrl
@@ -145,7 +140,6 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
           </form>
         ) : (
           <>
-            {/* 🚀 GUNAKAN `firestorePhoto` AGAR SELALU AMBIL DARI DATABASE */}
             <img 
               src={firestorePhoto || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"} 
               alt="Avatar" 
@@ -199,6 +193,15 @@ export default function Profil({ isDarkMode, setIsDarkMode, onNavigate, savedCou
                     <FaMoon style={{ color: '#888' }} /> <span>Mode Gelap</span>
                   </>
                 )}
+              </button>
+
+              {/* 🚀 TOMBOL MENU TENTANG APLIKASI (BARU) */}
+              <button 
+                onClick={() => onNavigate('about')} 
+                className="btn-menu-about"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', backgroundColor: 'rgba(52, 152, 219, 0.1)', color: '#3498db', border: '1px solid rgba(52, 152, 219, 0.3)' }}
+              >
+                <FaInfoCircle /> Tentang Aplikasi
               </button>
               
               <button 

@@ -1705,11 +1705,19 @@ header {
     align-items: center;
     gap: 12px;
     padding: 15px 20px;
-    background-color: var(--bg-main);
+    background-color: var(--nav-bg);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     position: sticky; /* Nempel terus di atas walau di-scroll */
     top: 0;
     z-index: 1000;
+    transition: background-color 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .mobile-top-header.is-scrolled {
+    background-color: color-mix(in srgb, var(--nav-bg) 72%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   }
 
   .mobile-logo {

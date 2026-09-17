@@ -18,11 +18,12 @@ import Auth from './features/auth/Auth';
 import DetailCafe from './DetailCafe';
 import Toast from './component/toast';
 import Admin from './features/dashboard/Admin';
+import About from './features/dashboard/About';
 
 // Import Firebase Auth, Firestore
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, onSnapshot, setDoc, deleteDoc, collection } from 'firebase/firestore'; 
-import { auth, db } from './config/firebase'; 
+import { doc, onSnapshot, setDoc, deleteDoc, collection } from 'firebase/firestore';
+import { auth, db } from './config/firebase';
 
 // ==========================================
 // 📋 KOMPONEN SIDEBAR (DESKTOP)
@@ -33,7 +34,7 @@ const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
       <div className="sidebar-brand">
         <h2>Nongkrongyuk</h2>
       </div>
-      
+
       <nav className="sidebar-menu">
         <div className={`sidebar-item ${currentPage === 'beranda' ? 'active' : ''}`} onClick={() => onNavigate('beranda')}>
           <FaHome className="sidebar-icon" /><span>Beranda</span>
@@ -72,9 +73,9 @@ const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
         width: '100%',
         boxSizing: 'border-box'
       }}>
-        <img 
-          src="/logo-no-bg.png" 
-          alt="Logo Nongkrongyuk" 
+        <img
+          src="/logo-no-bg.png"
+          alt="Logo Nongkrongyuk"
           style={{
             width: '85%',
             height: 'auto',
@@ -98,28 +99,40 @@ const Sidebar = ({ currentPage, onNavigate, isLoggedIn, onLogout }) => {
 // ==========================================
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [currentPage, setCurrentPage] = useState('beranda'); 
+  const [isMobileHeaderScrolled, setIsMobileHeaderScrolled] = useState(false);
+  const [currentPage, setCurrentPage] = useState('beranda');
   const [selectedCafeId, setSelectedCafeId] = useState(null);
-  
+
   const [toastMessage, setToastMessage] = useState(null);
   const [isToastHiding, setIsToastHiding] = useState(false);
-  
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAuthReady, setIsAuthReady] = useState(false); 
-  
+  const [isAuthReady, setIsAuthReady] = useState(false);
+
   // 🚀 STATE PENTING: Pisahkan akun asli (Auth) dengan data tampilan (UI Profile)
   const [currentUser, setCurrentUser] = useState(null); // Untuk keperluan logika ke server
   const [userProfile, setUserProfile] = useState(null); // KHUSUS UNTUK TAMPILAN FOTO & NAMA DI WEB
-  
-  const [userRole, setUserRole] = useState('user'); 
+
+  const [userRole, setUserRole] = useState('user');
   const [reviewCount, setReviewCount] = useState(0);
-  
+
   const [cafes, setCafes] = useState([]);
-  const [savedCafes, setSavedCafes] = useState([]); 
+  const [savedCafes, setSavedCafes] = useState([]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsMobileHeaderScrolled(window.scrollY > 12);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // 1. MANTRA LOGIN
   useEffect(() => {
@@ -138,23 +151,23 @@ export default function App() {
         setIsLoggedIn(false);
         setCurrentUser(null);
         setUserProfile(null);
-        setSavedCafes([]); 
-        setReviewCount(0); 
-        setUserRole('user'); 
+        setSavedCafes([]);
+        setReviewCount(0);
+        setUserRole('user');
       }
-      setIsAuthReady(true); 
+      setIsAuthReady(true);
     });
     return () => unsubscribe();
   }, []);
 
   // 2. MANTRA FIRESTORE SEBAGAI SUMBER KEBENARAN UTAMA (Single Source of Truth)
   useEffect(() => {
-    if (!currentUser) return; 
+    if (!currentUser) return;
 
     // Tarik data bookmark
     const bookmarksRef = collection(db, 'users', currentUser.uid, 'bookmarks');
     const unsubscribeBookmarks = onSnapshot(bookmarksRef, (snapshot) => {
-      const listIds = snapshot.docs.map(doc => parseInt(doc.id)); 
+      const listIds = snapshot.docs.map(doc => parseInt(doc.id));
       setSavedCafes(listIds);
     }, (error) => {
       console.error("Gagal memuat bookmarks:", error);
@@ -165,16 +178,16 @@ export default function App() {
     const unsubscribeUserDoc = onSnapshot(userDocRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.data();
-        
+
         // 🚀 TIMPA DATA TAMPILAN DENGAN DATA DARI FIRESTORE
         setUserProfile(prev => ({
           ...prev,
           displayName: data.displayName || prev?.displayName,
           photoURL: data.photoURL || prev?.photoURL // FOTO IMGBB MASUK SINI!
         }));
-        
-        setReviewCount(data.reviewCount || 0); 
-        setUserRole(data.role || 'user'); 
+
+        setReviewCount(data.reviewCount || 0);
+        setUserRole(data.role || 'user');
       } else {
         setReviewCount(0);
         setUserRole('user');
@@ -194,7 +207,7 @@ export default function App() {
     const cafesCollectionRef = collection(db, 'cafes');
     const unsubscribeCafes = onSnapshot(cafesCollectionRef, (snapshot) => {
       const dataDariFirebase = snapshot.docs.map(doc => ({
-        ...doc.data() 
+        ...doc.data()
       }));
       setCafes(dataDariFirebase);
     }, (error) => {
@@ -210,11 +223,11 @@ export default function App() {
     setTimeout(() => {
       setIsToastHiding(true);
       setTimeout(() => { setToastMessage(null); }, 300);
-    }, 2500); 
+    }, 2500);
   };
 
   const handleToggleSave = async (id, e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     if (!currentUser) return;
 
     const docRef = doc(db, 'users', currentUser.uid, 'bookmarks', id.toString());
@@ -228,7 +241,7 @@ export default function App() {
       }
     } else {
       try {
-        await setDoc(docRef, { 
+        await setDoc(docRef, {
           savedAt: new Date().toISOString(),
           cafeId: id
         });
@@ -251,7 +264,7 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); 
+      await signOut(auth);
       setIsLoggedIn(false);
       navigateTo('beranda');
       showToast("Kamu telah keluar akun 👋");
@@ -275,20 +288,20 @@ export default function App() {
       <Toast message={toastMessage} isHiding={isToastHiding} />
 
       <div className="main-layout">
-        
+
         {/* SIDEBAR DESKTOP */}
         {currentPage !== 'admin' && (
           <Sidebar currentPage={currentPage} onNavigate={navigateTo} isLoggedIn={isLoggedIn} onLogout={handleLogout} />
         )}
 
         <div className="page-content-wrapper">
-          
+
           {/* HEADER KHUSUS MOBILE */}
-          <header className="mobile-top-header">
-            <img 
-              src="/logo.png" 
-              alt="Logo Nongkrongyuk" 
-              className="mobile-logo" 
+          <header className={`mobile-top-header ${isMobileHeaderScrolled ? 'is-scrolled' : ''}`}>
+            <img
+              src="/logo.png"
+              alt="Logo Nongkrongyuk"
+              className="mobile-logo"
               onClick={() => navigateTo('beranda')}
             />
             <h2 onClick={() => navigateTo('beranda')}>Nongkrongyuk</h2>
@@ -300,41 +313,41 @@ export default function App() {
           */}
           {currentPage === 'beranda' && (
             isLoggedIn ? (
-              <Beranda 
-                isDarkMode={isDarkMode} 
-                setIsDarkMode={setIsDarkMode} 
-                cafeData={cafes} 
+              <Beranda
+                isDarkMode={isDarkMode}
+                setIsDarkMode={setIsDarkMode}
+                cafeData={cafes}
                 savedCafes={savedCafes}
                 onCafeClick={handleNavigateToDetail}
                 onToggleSave={handleToggleSave}
                 onNavigate={navigateTo}
-                currentUser={userProfile} 
+                currentUser={userProfile}
               />
             ) : (
-              <LandingPage 
-                isDarkMode={isDarkMode} 
-                setIsDarkMode={setIsDarkMode} 
-                cafeData={cafes} 
+              <LandingPage
+                isDarkMode={isDarkMode}
+                setIsDarkMode={setIsDarkMode}
+                cafeData={cafes}
                 onNavigate={navigateTo}
-                showToast={showToast} 
+                showToast={showToast}
               />
             )
           )}
-          
+
           {currentPage === 'detail' && isLoggedIn && (
             <DetailCafe cafe={activeCafe} onBack={() => navigateTo('beranda')} />
           )}
 
           {currentPage === 'simpan' && isLoggedIn && (
-            <Simpan 
-              isDarkMode={isDarkMode} 
-              setIsDarkMode={setIsDarkMode} 
-              cafeData={cafes} 
+            <Simpan
+              isDarkMode={isDarkMode}
+              setIsDarkMode={setIsDarkMode}
+              cafeData={cafes}
               savedCafes={savedCafes}
               onCafeClick={handleNavigateToDetail}
               onToggleSave={handleToggleSave}
               onNavigate={navigateTo}
-              currentUser={userProfile} 
+              currentUser={userProfile}
             />
           )}
 
@@ -347,14 +360,14 @@ export default function App() {
           )}
 
           {currentPage === 'profil' && isLoggedIn && (
-            <Profil 
-              isDarkMode={isDarkMode} 
-              setIsDarkMode={setIsDarkMode} 
+            <Profil
+              isDarkMode={isDarkMode}
+              setIsDarkMode={setIsDarkMode}
               onNavigate={navigateTo}
               savedCount={savedCafes.length}
-              reviewCount={reviewCount} 
+              reviewCount={reviewCount}
               onLogout={handleLogout}
-              userRole={userRole} 
+              userRole={userRole}
             />
           )}
 
@@ -363,12 +376,20 @@ export default function App() {
           )}
 
           {currentPage === 'admin' && isLoggedIn && (
-            <Admin 
-              isDarkMode={isDarkMode} 
-              setIsDarkMode={setIsDarkMode} 
-              onNavigate={navigateTo} 
-              currentUser={userProfile} 
-              cafeData={cafes} 
+            <Admin
+              isDarkMode={isDarkMode}
+              setIsDarkMode={setIsDarkMode}
+              onNavigate={navigateTo}
+              currentUser={userProfile}
+              cafeData={cafes}
+            />
+          )}
+
+          {currentPage === 'about' && (
+            <About
+              isDarkMode={isDarkMode}
+              setIsDarkMode={setIsDarkMode}
+              onNavigate={navigateTo}
             />
           )}
         </div>
@@ -380,7 +401,7 @@ export default function App() {
           <div className={`nav-item ${currentPage === 'beranda' ? 'active' : ''}`} onClick={() => navigateTo('beranda')}>
             <FaHome className="nav-icon" /><span className="nav-text">Beranda</span>
           </div>
-          
+
           <div className={`nav-item ${currentPage === 'peta' ? 'active' : ''}`} onClick={() => navigateTo('peta')}>
             <FaMapMarkedAlt className="nav-icon" /><span className="nav-text">Peta</span>
           </div>
